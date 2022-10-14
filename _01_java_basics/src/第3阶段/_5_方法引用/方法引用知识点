@@ -1,0 +1,150 @@
+方法引用知识点目录:
+    方法引用符:
+    类名引用静态方法:
+    对象名引用实例方法:
+    类名引用实例方法:
+
+方法引用符:
+    使用流程:
+        usePrintable(s -> System.out.println(s));
+
+        usePrintable(System.out::println);              //方法引用实现接口 在接口的方法中引用了System.out.println的代码
+    基本说明:
+        :: 为方法引用符
+        方法引用是用来替代Lambda表达式, 由Lambda表达式简化得来
+        用于借用任意位置的代码(如果上下文环境符合的话)
+    使用的格式:
+         usePrintable(System.out::println(s))
+
+类名引用静态方法:
+    使用流程:
+        useConverter(new Converter() {                      //内部类实现接口
+            @Override
+            public int useConvert(String s) {
+                return Integer.parseInt(s);
+            }
+        });
+
+        useConverter( (s) ->  Integer.parseInt(s));         //Lambda实现接口
+
+        useConverter(Integer::parseInt);                    //引用类方法实现接口
+
+
+        private static void useConverter(Converter c){
+            int number = c.useConvert("9277");
+            System.out.println(number);
+        }
+    基本说明:
+        类名引用静态方法, 参数全部传递给被引用的静态方法
+        引用类方法, 其实就是引用类中的静态方法
+        Lambda表达式被类方法代替的时候, 它的形式参数全部传递给被引用的静态方法, 并作为该静态方法的参数
+    类名引用静态方法的参数传递:
+        参数全部传递给被引用的静态方法
+    代码格式:
+        格式:
+            类名::静态方法名
+        范例:
+            Integer::parseInt
+            //Integer类的parseInt方法: public static int parseInt(String s){}; 将s转为int类型并返回
+
+对象名引用实例方法:
+    使用流程:
+        //使用Lambda直接重写接口, 输出大写字符串
+        usePrinter( s -> System.out.println(s.toUpperCase()));
+
+        //引用PrintString的代码, 实现接口
+        PrintString ps = new PrintString();
+        usePrinter(ps::printUpper);
+
+
+        (PrintString 引用该类的PrintUpper方法)
+        public class PrintString {
+            public void printUpper(String s){
+                String us = s.toUpperCase();
+                System.out.println(us);
+            }
+        }
+
+        (接口 Printer)
+        public interface Printer {
+            void printUpperCase(String s);
+        }
+
+
+    基本说明:
+        对象名引用实例方法,形式参数全部传递给该方法作为参数
+        引用对象的实例方法, 其实就是引用类的成员方法
+        Lambda表达式被对象的实例方法替代的时候, 它的形式参数全部传递给该方法作为参数
+    对象名引用实例方法的参数传递:
+        形式参数全部传递给该方法作为参数
+    代码格式:
+        格式:
+            对象::成员方法
+        范例:
+            String s = "hello world"
+            s::toUpperCase
+            //public String toUpperCase(); String的成员方法, 用于将字符串全部转为大写
+
+类名引用实例方法:
+    使用流程:
+
+        useMyString( (s, x, y) -> s.substring(x,  y));      //Lambda实现MyString接口
+
+        useMyString(String::substring);                     //类名引用成员方法, 实现MyString接口
+
+        private static void useMyString(MyString s) {
+            String result = s.mySubString("hello java", 6, 10);
+            System.out.println(result);
+        }
+
+
+        (MyString)
+        public interface MyString {
+            String mySubString(String s, int x, int y);
+        }
+    基本说明:
+        类名引用实例方法:
+            第一个参数作为调用者
+            后面的参数全部传递给该方法作为参数
+        类名引用静态方法, 就是引用类的成员方法
+    类名引用实例方法的参数传递:
+        第一个参数作为调用者
+        后面的参数全部传递给该方法作为参数
+    代码格式:
+        格式:
+            类名::成员方法名
+        实例:
+            String::substring
+            //String类中的方法, public String substring(int beginIndex, int endIndex)
+            //      从beginIndex开始到endIndex结束, 截取字符串, 返回一个字串, 字串的长度为endIndex - beginIndex
+
+类名引用构造方法:
+    基本说明:
+        package2.Student s1 = useStudentBuilder((name, age) -> new package2.Student(name, age));      //Lambda表达式实现StudentBuilder接口
+
+        package2.Student s2 = useStudentBuilder(package2.Student::new);                               //类名引用StudentDemo实现StudentBuilder接口
+
+        System.out.println(s1.toString() + s1.hashCode() + "\n" + s2.toString() + s2.hashCode());
+
+        private static package2.Student useStudentBuilder(StudentBuilder sb) {
+            return sb.build("张辉", 22);
+        }
+
+        (Student类 这里不写)
+
+        (StudentBuilder 接口)
+        public interface StudentBuilder {
+            package2.Student build(String name, int age);
+        }
+
+    基本说明:
+        类名引用构造方法, 参数全部传递给构造方法作为参数
+        用来在接口中调用构造方法, 返回一个对象
+    类名引用构造方法的参数传递:
+        类名引用构造方法, 参数全部传递给构造方法作为参数
+    代码格式:
+        格式:
+            类名::new
+        范例:
+            package2.Student::new
+

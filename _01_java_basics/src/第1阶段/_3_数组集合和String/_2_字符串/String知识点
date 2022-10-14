@@ -1,0 +1,143 @@
+String:
+    概述:
+        String位置:
+            String类在java.lang包下, 无需导包
+        运行:
+            java程序的所有字符串, 都是String的对象
+        特点:
+            字符串不可变, 它的值创建后不可更改
+            可以被共享
+            字符串效果上相当于-->字符数组char[], 但底层原理是-->字节数组byte[]
+    String类的四种构造方法:
+            String s = "abc"                 //直接构造
+            public String() {...}            //无参构造,创建空白字符串对象
+            public String(char[] chs) {...}  //字符数组构造,根据数组内容创建对象
+            public String(byte[] bys) {...}  //字节数组构造,根据数组内容创建对象
+string对象的特点:
+    1.通过"xxx"创建字符串, 如果字符串内容相同:
+        "xxx"本身就是一个对象
+        str = "xxx" 只是传递了地址
+        程序中所有相同的"xxx"或代称, 本身都只存一个地址, 指向字符池中的"xxx"
+        与其他多对象指向相同的情况相比, 通过名字打印的是内容而不是地址,
+    2.通过new创建字符串
+        本质上是创建新对象
+        通过new创建字符串对象, 每次new都申请一个新内存地址
+字符串的比较:
+    用 == 做比较:
+        基本类型: 比较数据值是否相同;
+        引用类型: 比较名字存的地址是否相同
+    .equals() //对象为字符串
+        作用:
+            比较两个字符串的内容是否相容
+        方法详情:
+            public boolean equals(Object anObject)
+                -->返回值为boolean, 参数为一个对象
+        用法实例: //s1, s2都为字符串对象
+            s1.equles(s2);
+字符串的遍历:
+    使用流程:
+        String str = "java"
+
+        for (int x=0; x<str.length(); x++) {
+            char chr = str.charAt(x);
+            System.out.print(chr);
+        }
+    .charAt()  //对象为字符串
+        作用:
+            根据index返回char
+        方法详情:
+            public char charAt(int index)
+    .length()  //对象为字符串
+        作用:
+            返回字符串长度
+        方法详情:
+            public int length()
+
+StringBuilder:
+    使用流程:
+        (空构建)
+        StringBuilder sb = new StringBuilder();
+
+        sb.append('a').append(1).append("java")
+        String str = sb.toString();
+
+        (非空构建)
+        String s = "hello"
+        StringBuilder sb = new StringBuilder(s);
+
+        sb.append('a').append(1).append("java")
+        String str = sb.toString();
+
+    基本说明
+        对字符串拼接, 每次拼接都会构建一个新的String对象耗时且浪费内存
+        通过StringBuilder类来解决这个问题
+        是一个可变的字符串类, 可看作一个容器
+        可变指的是StringBuilder对象中的内容是可变的
+    构造方法:
+        public StringBuilder()  //无参构造, 返回一个可变的空白字符串对象
+        public StringBuilder(String s)   //有参构造, 根据传参内容, 创建可变字符串对象
+    普通方法:
+        .append(任意类型)
+            作用:
+                在结尾添加数据, 返回给本对象.
+            方法详情:
+                public StringBuilder append(任意类型)  //返回StringBuiler对象, 传参为任意类型
+
+        .reverse()
+            作用:
+                返回反转后的字符串, 返回给本对象
+            方法详情:
+                public StringBuilder reverse()  //
+
+    String对象和StringBuilder对象的相互转换:
+        String --> StringBuilder:
+            通过StringBuilder的构造方法, 直接创建sb对象
+                s = "abc";
+                StringBuilder sb = new StringBuilder(s)
+        StringBuilder --> String:
+            通过.toString方法, 返回一个字符串
+                s = sb.toString()
+
+统计字符串每个字符出现的顺序:
+    使用流程:
+        String s = "helloWorldJava";
+
+        HashMap<Character, Integer> hm = new HashMap<>();
+
+        //给集合添加元素, 首次出现的字符hm.put(key, 1), 不是首次出现的字符hm.put(key, value++)
+        for (int i = 0; i < s.length(); i++) {
+            char key = s.charAt(i);
+            Integer value = hm.get(key);
+            if (value == null) {
+                hm.put(key, 1);             //首次出现, value(次数)为1
+            } else {
+                value ++;                   //不是首次出现, value++
+                hm.put(key,value);
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        //遍历集合, 获取key和value, 按要求添加为可变字符串
+        Set<Character> keySet = hm.keySet();
+        for(Character key : keySet) {
+            Integer value = hm.get(key);
+            sb.append(key).append('(').append(value).append(')');
+        }
+        //可变字符串转换为字符串
+        String str = sb.toString();
+
+    基本说明:
+        重点 --> 生成存储 字符 : 字符出现次数 Map集合(TreeMap或HashMap)
+        TreeMap 根据键来排序
+        HashMap 不排序
+    集合存储字符及字符的出现次数:
+        for (int i = 0; i < s.length(); i++) {
+            char key = s.charAt(i);
+            Integer value = hm.get(key);
+            if (value == null) {
+                hm.put(key, 1);             //首次出现, value(次数)为1
+            } else {
+                value ++;                   //不是首次出现, value++
+                hm.put(key,value);
+            }
+        }

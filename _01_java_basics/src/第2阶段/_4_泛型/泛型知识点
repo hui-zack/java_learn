@@ -1,0 +1,214 @@
+泛型知识点目录:
+    泛型 -->
+        泛型类,泛型方法, 和泛型通配符
+        泛型:
+        泛型类:
+        泛型方法:
+        泛型接口:
+        类型通配符:
+        可变参数:
+        Collection中可变参数的使用:
+
+泛型类,泛型方法, 和泛型通配符
+    泛型类和泛型方法 --> 都是在定义变量的数据类型:
+    类型通配符 --> 限制变量的数据类型
+
+泛型:
+    使用流程:
+        //指定泛型
+        HashSet<String> hs = new HashSet<String>();      // 泛型: String
+
+        add("hello");
+        add("world");
+        add("java");
+
+        for (String s : hs) {
+            System.out.println(s);
+        }
+
+
+        //不指定泛型
+        HashSet hs = new HashSet();
+
+        add("hello")    //形参类型默认为Object, 构成多态, 只要是引用类型都不报错
+        add("world");
+        add("java");
+
+        Iterator it = hs.iterator();
+        while(it.hasNext()) {
+            String s = (String)it.next();       //it中的元素是Object类型, 需要向下转型
+            System.out.println(s);              //如果集合中有非String类型的元素, 就会报错, runTime错误
+        }
+    基本说明:
+        是JDK5中引入的新特性
+        泛型的使用避免了某些场景下的强制转型
+        允许在编译时就检测到非法的类型, 而不是等到运行报错
+        将类型由原来具体的类型参数话, 调用时传入执行的类型
+
+    泛型的定义格式:
+        <类型>
+            指定一种类型的格式, 这里的类型可以看成是形参
+        <类型1, 类型2...>
+            指定多种类型的格式, 之间用逗号隔开, 这里的类型可看作是形参
+            具体调用时给定的类型可以看作是实参, 并且实参的类型只能是引用数据类型
+
+
+泛型类:
+    使用流程:
+        (定义泛型类)
+            public class Generic<T> {
+                private T t;
+
+                public T getT() {
+                    return this.t;
+                }
+
+                public void setT(T t) {
+                    this.t = t;
+                }
+            }
+        (使用泛型类)
+            Generic<String> g1 = new Generic<String>();     //使用泛型
+
+            g1.set("林青霞");
+            System.out.println(g1.getT());
+
+
+            Generic<Integer> g2 = new Generic<Integer>();
+
+            g1.set(22)
+            System.out.println(g2.get());
+    基本说明:
+        泛型代值一切引用变量
+        泛型类说明其成员变量包含泛型变量
+        泛型类在使用时必须指定引用类型, 不然向下转型很痛苦
+    定义泛型类:
+        实例:
+            public class Generic<T>
+        格式:
+            修饰符 class 类型<T> {} //
+                此处T可以随便写为任意标识, 常见有T, E, K, V 等
+
+泛型方法:
+    使用流程:
+        (定义泛型方法)
+        public <T> void show(T t) {
+            System.out.println(t);
+        }
+
+        (使用泛型方法)
+        Generic g1 = new Generic();
+
+        g1.show("林青霞");
+        g1.show("30");
+        g1.show(true);
+
+    基本说明:
+        泛型方法在使用时, 像普通方法一样, 直接使用
+        泛型方法说明其形参可以是不同种类的对象
+    泛型方法的定义格式:
+        实例:
+            public <T> void show(T t) {}
+        格式:
+            修饰符 <T> 返回值类型 方法名(T t) {}
+
+泛型接口:
+    使用流程:
+        (接口)
+        public interface Generic<T> {
+            public void show(T t);
+        }
+
+        (接口实现类)
+        public class GenericImpl<T> implements Generic<T> {
+            @override
+            public void show(T t) {
+                System.out.println(t);
+            }
+        }
+
+        (Demo)
+        GenericImpl<String> gl = new GenericImpl<String>();
+        System.out.println(gl.show("java"))
+    基本说明:
+        泛型接口在实例化接口对象时, 必须指定类型
+
+类型通配符:
+    使用流程:
+        List<?> l1 = new ArrayList<Object>();                   //元素为任意引用类型
+
+        List<? extends Number> l2 = new ArrayList<Number>();    //限制元素上限
+        List<? extends Number> l3 = new ArrayList<Integer>();
+
+        List<? super Number> l4 = new ArrayList<Number>();      //显示元素下限
+        List<? super Number> l5 = new ArrayList<Object>();
+    基本说明:
+        子类元素类型的范围受父类通配符限制
+        通配符是 限制/增广 元素或成员 变量的方式
+        用于标识各种泛型List元素的父类, 可以使用类型通配符
+        List<?> 表示它是各种泛型List的父类, 并不能把元素添加到其中
+
+    元素继承关系(范围关系):
+        Object
+            Number
+                Integer
+    元素无限制List:
+        List<?> l = new ArrayList<Object>();
+            ArrayList的元素Object <= List的元素范围(<?> 不限制元素类型) --> 不报错
+
+    元素上限:`
+        实例:
+            List<? extend Number> l = new ArrayList<Number>();
+        说明:
+            ArrayList的元素Number  <=  List的Number      --> 不报错
+
+    元素下限:
+        实例:
+            List<? super Number> l = new ArrayList<Object>();
+        说明:
+             ArrayList的元素Object  >=  List的Number       --> 不报错
+
+可变参数:
+    使用流程:
+         public static int sum (int... a) {         //只有可变参数当形参
+             for(int i : a) {                       //可变参数是一个数组
+                 System.out.println(i);
+             }
+         }
+
+        public static int sum(String s, int... a) {   //可变参数作为形参之一, 放到最后
+             ...;
+        }
+
+    基本说明:
+        定义方法中用可变参数
+        可变参数是一个数组, 在方法内部当成数组使用
+        多个参数包含可变参数, 可变参数放到最后
+
+Collection中可变参数的使用:
+    使用流程:
+        List<String> lst = Arrays.asList("hello", "world", "java");     //使用Arrays.asList(T... a)方法构建固定长度列表
+
+        List<String> lst1 = List.of("hello", "world", "java");          //使用List.of(E... elements)方法构建不可变列表
+
+        Set<String> st = Set.of("hello", "world", "java");              ////使用Set.of方法()构建集合不可变集合
+
+    基本说明:
+        三个生成集合的方法是通过可变参数实现的
+        Arrays   List    Set
+        他们的子类不能通过这种方式得到集合
+    三个生成特殊集合的方法:
+        public static <T> List<T> aList<T... a>
+            Arrays工具类的方法
+            返回长度固定的List集合, 不能增删, 能修改
+        public static <T> List<T> of(E... element)
+            List的方法
+            返回不可变列表,  不能增删改
+        public static <E> Set<E> of(E...elements)
+            Set的方法
+            返回不可变Set集合, 不能增删改, 添加重复元素会报错
+
+
+
+
+

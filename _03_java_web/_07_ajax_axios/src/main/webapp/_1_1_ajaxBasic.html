@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <script>
+        //1. 创建ajax核心对象
+        var xHttp;
+        if (window.XMLHttpRequest) {
+            xHttp = new XMLHttpRequest();
+        } else {
+            // code for IE6, IE5
+            xHttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        //2. 发送请求
+        xHttp.open("POST", "http://localhost/ajaxServlet");
+        xHttp.send();
+        //3. 获取响应对象
+        xHttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+
+                    alert(this.responseText);
+            }
+        };
+    </script>
+</body>
+</html>

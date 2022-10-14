@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+    <div id="app">
+        <a :href="url">点击跳转</a>                                      <!-- 1. v-bind -->
+                <!-- :href 是v-bind:href的简化书写 -->
+        <input v-model="url" type="text">                               <!-- 2. v-model -->
+
+        <input type="button" value="一个按钮" @click="show()">           <!-- 3. v-on -->
+                <!-- @click是v-on:click的简化书写 -->
+
+    </div>
+
+    <script src="js/vue.js"></script>
+    <script>
+        new Vue({
+            el: "#app",
+            data() {
+                return {
+                    username: "",
+                    url: "https://baidu.com",
+                }
+            },
+            method:{
+                show(){
+                    alert("我被点了");
+                    document.write("123");
+                }
+            }
+        });
+
+
+    </script>
+</body>
+</html>

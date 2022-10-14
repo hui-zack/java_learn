@@ -1,0 +1,368 @@
+反射知识点目录:
+    类加载器获取src任意文件绝对路径:
+
+    反射概述:
+    反射知识体系:
+
+    反射构造创建对象:
+    反射构造创建对象案例:
+    反射变量并赋值:
+    反射变量赋值案例:
+    反射方法并调用:
+    反射方法案例:
+
+    越过泛型检查:
+    配置文件运行类中方法:
+反射知识体系:
+    类加载器获取src及Resources根目录中任意文件绝对路径:
+        String path = thisDemo.class.getClassLoader().getResource("config/set.properties").getPath();       //* getResource(String 相对src路径)
+
+    获取Class对象的方法:
+        package2.Student.class                                                  --> 类名调用class属性
+        s.getClass()                                                            --> 对象名调用getClass方法
+        Class.forName(String className)                                         --> Class类的静态方法forName(String className)
+
+    反射构造创建对象:
+        Class类的成员方法:
+            返回多个构成的数组:
+                getConstructors():                                              --> 返回 构造方法对象的数组 (只能用于public修饰的构造方法)
+                getDeclaredConstructors():                                      --> 返回 构造方法对象的数组 (可用于所有构造方法)
+            返回单个:   ( 参数的形式为: (String.class, int.class) )
+                getConstructor(Class<?>...parameterTypes):                      --> 返回 指定构造方法的对象 (只能用于public修饰的构造方法)
+                getDeclaredConstructor(Class<?>...parameterTypes):              --> 返回 指定构造方法的对象 (可用于所有构造方法)
+        Constructor类的成员方法:
+            con.setAccessible(True)                                             --> 开启暴力反射, 允许反射private构造创建对象
+            con.newInstance(Object... initargs):                                --> 根据获取的构造创建对象, Constructor类的成员方法
+
+    反射变量赋值:
+        Class类的成员方法:
+            返回多个构成的数组:
+                getFields():                                                    --> 返回 所有public成员变量对象的数组
+                getDeclaredFields():                                            --> 返回 所有成员变量对象的数组
+            返回单个:           (参数为该成员变量的真实名称)
+                getField(String name):                                          --> 返回 指定的public成员变量的对象
+                getDeclaredField(String name):                                  --> 返回 指定的成员变量的对象
+
+        Field的成员方法:
+            public void setAccessible(Boolean flag):                            --> 开启暴力反射开关, 允许Class反射private变量赋值
+            void set(Object obj, Object value):                                 --> 给obj对象的成员变量赋值为value; 注意这个obj对象是反射创建的对象或正常创建的对象
+
+    反射方法调用:
+        Class成员方法:
+            返回多个构成的数组:
+                getMethods():                                                   --> 返回 所有public成员变量方法的数组, 含父类的方法
+                getDeclaredMethods():                                           --> 返回 所有成员方法的数组, 不含父类的方法
+            返回单个:           (参数为该方法的真实名称 + 需要的参数)
+                getMethod(String name, Class<?>...parameterTypes):              --> 返回 指定的public方法的对象
+                getDeclaredMethod(String name, Class<?>...parameterTypes):      --> 返回 指定的方法的对象
+        Method成员方法:
+            setAccessible(true)                                                 --> 暴力反射开
+            showMethod.invoke(obj, "show");                                     --> 调用反射的方法, 注意这个obj对象是反射创建的对象或正常创建的对象
+
+
+------------------------------------------------------------------------------------------------------------------------
+类加载器获取src任意文件绝对路径:
+    使用流程:
+        String path = Demo.class.getClassLoader().getResource("config/set.properties").getPath();       //* getResource(String 相对src路径)
+        System.out.println(path);
+    基本说明:
+        可用来获取src下任意文件的绝对路径
+        路径中不可有中文
+        getResource("config/set.properties") 中的"/"不能用"\\"代替
+
+反射概述:
+    概念说明:
+        java反射机制: 指在运行时取获取一个类的变量和方法信息,调用方法的一种机制
+        可以极大的增强程序的灵活性, 程序不用在编译期就完成确定, 在运行期仍然可以进行扩展
+        .class文件(字节码文件)所属的类是class类
+
+
+获取Class对象的方法:
+    使用流程:
+        Class<package2.Student> c1 = package2.Student.class;                                  //package2.Student.class 返回.class对象 ;Object类的静态成员变量
+        System.out.println(c1);
+
+        package2.Student s = new package2.Student();
+        Class<? extends package2.Student> c2 = s.getClass();                         //getClass()方法, 返回一个.class对象; 是Object类的方法
+        System.out.println(c2);
+
+        //Class.forName(String className)方法返回Class对象
+        Class<?> c3 = Class.forName("第3阶段._8_反射._0_获取Class对象.package2.Student");      //forName(String className)方法 参数为java文件的地址, 返回一个.class对象; Class类的静态方法
+        System.out.println(c3);
+    基本说明:
+        获取Class对象有三种方法
+            类名调用class属性
+            对象名调用getClass方法
+            Class类的静态方法forName(String className)
+
+    获取Class对象有三种方法:
+        1.类名调用静态属性class属性获取Class对象:
+            说明:
+                class属性是Object的静态属性, 使用类名直接调用,如Student.class
+                    返回Student类对应的Class对象
+            实例:
+                Class<package2.Student> c = package2.Student.class
+        2.对象名调用getClass()方法:
+            说明:
+                getClass()方法是Object类中的方法, 所有的java对象都可以调用该方法
+            实例:
+                package2.Student s = new package2.Student();
+                Class<? extends package2.Student> c2 = s.getClass();
+        3.使用Class类中的静态方法forName(String className)
+            说明:
+                参数是Class文件包名表示的绝对/相对地址,
+            实例:
+                Class<?> c3 = Class.forName("第3阶段._8_反射._0_获取Class对象.package2.Student");
+                System.out.println(c3);
+
+反射构造创建对象:
+    使用流程:
+        Class<?> sc = Class.forName("第3阶段._8_反射._0_获取Class对象.package2.Student");              //获取class对象; Class类的静态方法
+
+
+        Constructor<?>[] cons1 = sc.getConstructors();                              //Class的getConstructors()方法, 获取共有构造方法对象的数组
+
+        Constructor<?>[] cons2 = sc.getDeclaredConstructors();                      //Class的getDeclaredConstructors()方法, 获取所有构造方法对象的数组
+
+        Constructor<?> con1 = sc.getConstructor();                                  //Class的getConstructor()方法, 返回 指定public构造方法的对象
+
+        Constructor<?> con2 = sc.getDeclaredConstructor(String.class, int.class);   //Class的getDeclaredConstructor()方法, 返回指定构造方法的对象
+
+
+        Object s1 = con1.newInstance();                                             //Constructor类的newInstance(), 根据获取的构造方法创建对象
+        System.out.println(s1);
+
+    基本说明:
+        返回多个构成的数组:
+            getConstructors():                                              --> 返回 构造方法对象的数组 (只能用于public修饰的构造方法)
+            getDeclaredConstructors():                                      --> 返回 构造方法对象的数组 (可用于所有构造方法)
+        返回单个:
+            getConstructor(Class<?>...parameterTypes):                      --> 返回 指定构造方法的对象 (只能用于public修饰的构造方法)
+            getDeclaredConstructor(Class<?>...parameterTypes):              --> 返回 指定构造方法的对象 (可用于所有构造方法)
+        con.setAccessible(true)                                             --> 开启暴力反射
+        con.newInstance(Object... initargs):                                --> 根据获取的构造创建对象, Constructor类的成员方法
+
+    Class类获取构造方法 的方法:
+        Constructor<?>[] getConstructors():
+            返回 public构造方法对象的数组
+        Constructor<?>[] getDeclaredConstructors():
+            返回 所有构造方法对象的数组
+
+        Constructor<T>[] getConstructor(Class<?>...parameterTypes):
+            返回 指定public构造方法的对象, 根据的参数形式指定构造方法
+            参数形式为: 数据类型.class
+                实例:
+                    Constructor<?> con2 = sc.Constructor(String.class);
+        Constructor<T[] getDeclaredConstructor(Class<?>...parameterTypes):
+            返回 指定构造方法的对象
+
+    Constructor类的成员方法:
+        暴力反射开关:
+            public void setAccessible(Boolean flag):
+                构造暴力反射开关, 允许Class拿到的private构造方法 来创建对象
+        创建对象方法:
+            T newInstance(Object... initargs):
+                参数为Class拿到的构造函数的参数
+
+反射构造创建对象案例:
+    案例1:
+        使用流程:
+            Class<?> cs = Class.forName("第3阶段._8_反射._0_获取Class对象.package2.Student");
+            Constructor<?> con = cs.getDeclaredConstructor(String.class, int.class, String.class);     //获取构造方法
+
+            Object s = con.newInstance("林青霞", 30, "西安");                                            //获取Student对象
+            System.out.println(s);
+        题目:
+            需求:使用反射获取构造方法并创建学生类的对象
+            要求:
+                通过反射实现如下的操作
+                    package2.Student s = new package2.Student("林青霞", 30, "西安")
+                    System.out.println(s)
+    案例2:
+        使用流程:
+            Class<?> cs = Class.forName("第3阶段._8_反射._0_获取Class对象.package2.Student");
+
+            Constructor<?> con1 = cs.getDeclaredConstructor(String.class);  //获取构造方法
+
+            con1.setAccessible(true);                                       //开启暴力反射, Constructor类的setAccessible(true)方法 ,
+            Object o = con1.newInstance("林清霞");                           //反射创建对象
+            System.out.println(o);
+
+        题目:
+            需求: 使用反射创建要求的学生对象, 使用暴力反射
+            要求:
+                通过反射实现如下操作
+                    package2.Student s = new package2.Student("林青霞")   -->这个是私有构造方法
+                System.out.println("S")
+
+反射变量并赋值:
+    使用流程:
+        Class<?> cs = Class.forName("第3阶段._8_反射._0_获取Class对象.package2.Student");
+
+        Constructor<?> con1 = cs.getDeclaredConstructor();                  //获取构造对象
+        con1.setAccessible(true);                                           //暴力反射
+        Object obj = con1.newInstance();                                    //反射创建对象
+
+        Field addressField = cs.getDeclaredField("address");                //Class类的getDeclaredField(String name):  获取成员变量对象
+        addressField.set(obj, "太原");                                       //Field类的set(Object obj, Object value), 成员变量赋值
+
+    基本说明:
+        反射为成员变量赋值, 必须有:
+            反射创建的Object对象
+            反射获取的成员变量Method对象
+        方法提醒:
+            Class成员方法:
+                getFields():
+                getDeclaredFields():
+                getField(String name):
+                getDeclaredField(String name):                  --> 根据变量的真实名称使用变量
+            Field的成员方法:
+                addressField.set(obj, "太原");                   --> 赋值时, 必须有 反射创建的对象, 反射获取的成员变量对象
+
+    Class类中用于获取成员变量的方法:
+        Field[] getFields():
+            返回 所有public成员变量对象的数组
+        Field[] getDeclaredFields():
+            返回 所有成员变量对象的数组
+        Field[] getField(String name):
+            返回 指定的public成员变量的对象
+        Field[] getDeclaredField(String name):
+            返回 指定的成员变量的对象
+            参数为成员变量的名称
+
+    Field的成员方法:
+        暴力反射开关:
+            public void setAccessible(Boolean flag):
+                变量暴力反射开关, 允许Class拿到的private构造方法 来创建对象
+        为反射成员变量赋值方法:
+            void set(Object obj, Object value):
+                给obj对象的成员变量赋值为value, obj为反射创建的对象, value为设置的参数值
+                注意这个这个obj对象必须是反射获取的对象
+
+反射变量赋值案例:
+    使用流程:
+        Class<?> cls = Class.forName("第3阶段._8_反射._0_获取Class对象.package2.Student");
+        Constructor<?> con = cls.getDeclaredConstructor();
+        Object obj = con.newInstance();                                     //创建无参学生对象
+
+
+        Field nameField = cls.getDeclaredField("name");                     //name变量赋值
+        nameField.setAccessible(true);
+        nameField.set(obj, "林青霞");
+
+        Field ageField = cls.getDeclaredField("age");                       //age变量赋值
+        ageField.setAccessible(true);
+        ageField.set(obj, 30);
+
+        Field addressField = cls.getDeclaredField("address");               //address变量赋值
+        addressField.set(obj, "西安");
+
+        System.out.println(obj);
+    基本说明:
+
+反射方法并调用:
+    使用流程:
+        Class<?> cls = Class.forName("第3阶段._8_反射._0_获取Class对象.package2.Student");
+        Constructor<?> con = cls.getDeclaredConstructor();
+        Object obj = con.newInstance();                                     //反射创建对象
+
+        Method showMethod = cls.getDeclaredMethod("show", String.class);    //反射方法对象
+        showMethod.setAccessible(true);                                     //暴力反射开关
+        showMethod.invoke(obj, "invoke方法");                                //invoke(Object obj, Object...args)方法,  调用反射方法
+
+    基本说明:
+        反射调用成员方法, 必须有:
+            反射创建的Object对象
+            反射获取的成员方法Method对象
+        方法提醒:
+            Class成员方法:
+                getMethod():
+                getDeclaredMethod():
+                getMethod(String name, Class<?>...parameterTypes):
+                getDeclaredMethod(String name, Class<?>...parameterTypes):
+            Field的成员方法:
+                showMethod.invoke(obj, "show");                   --> 赋值时, 必须有 反射创建的对象, 反射获取的成员变量对象
+                setAccessible(true)
+
+    Class类中用于获取成员方法的方法:
+        Method[] getMethods():
+            返回 所有public成员方法的数组, 包含所有超类方法
+        Method[] getDeclaredMethods():
+            返回 所有成员方法的数组, 不包含超类的方法
+        Method[] getMethod(String name, Class<?>...parameterTypes):
+            返回 指定public成员方法的对象
+            参数为成员方法的真实名称
+        Method[] getDeclaredMethod(String name, Class<?>...parameterTypes):
+            返回 指定的成员方法的对象
+            参数为成员变量的真实名称
+
+    Field的成员方法:
+        暴力反射开关:
+            public void setAccessible(Boolean flag):
+                变量暴力反射开关, 允许Class拿到的private构造方法 来创建对象
+        为反射成员变量赋值方法:
+            void invoke(Object obj, Object...args):
+                反射对象调用反射方法, obj为反射对象, args是方法需要的参数
+                注意这个这个obj对象必须是一个反射获取的对象
+
+反射方法案例:
+    使用流程:
+        Class<?> cls = Class.forName("第3阶段._8_反射._0_获取Class对象.package2.Student");
+        Constructor<?> con = cls.getDeclaredConstructor();
+        Object obj = con.newInstance();                                     //反射创建对象
+
+        Method method1 = cls.getMethod("method", String.class);             //反射method(String name)方法
+        method1.invoke(obj, "林青霞");                                       //反射调用该方法
+
+        Method method2 = cls.getMethod("method", String.class, int.class);  //反射method(String name, int age)方法
+        String ss = (String) method2.invoke(obj, "林青霞", 30);               //反射调用该方法
+        System.out.println(ss);
+
+        Method method3 = cls.getDeclaredMethod("show", String.class);       //反射show(String output)方法
+        method3.setAccessible(true);                                        //暴力反射
+        method3.invoke(obj,"java world");                                   //反射调用该方法
+    基本说明:
+        反射Student类的方法, 并调用
+        要求:
+            使用发射执行如下操作:
+                package2.Student s = new package2.Student();
+                s.method()
+                s.method("林青霞")
+
+                String ss = s.method("林青霞", 30);
+                System.out.println(ss);
+
+反射越过泛型检查:
+    使用流程:
+        ArrayList<Integer> list = new ArrayList<>();
+
+        Class<? extends ArrayList> cls = list.getClass();
+        Method add = cls.getMethod("add", Object.class);            //反射add方法
+        add.invoke(list, "java");                                   //反射调用add方法添加String
+        add.invoke(list, "world");
+        list.add(30);                                               //正常调用add方法添加int
+
+        System.out.println(list);
+    基本说明:
+        反射add方法获得的是原始的add方法, 可越过泛型检查
+
+
+配置文件运行类中方法:
+    使用流程:
+        Properties prop = new Properties();                                             //特殊操作流
+        FileReader fr = new FileReader("src\\第3阶段\\反射\\配置文件运行类中方法\\set.txt");
+        prop.load(fr);
+        fr.close();
+
+        String className = prop.getProperty("className");                                //读取类名
+        String method = prop.getProperty("method");                                      //读取方法名
+
+        Class<?> cls = Class.forName("第3阶段._8_反射._6_配置文件运行类中方法." + className);        //反射文件中写的类
+        Constructor<?> con = cls.getConstructor();
+        Object obj = con.newInstance();                                                 //反射对象
+
+        Method met = cls.getMethod(method);                                             //反射调用方法
+        met.invoke(obj);
+
+    基本说明:
+        Spring架构的核心

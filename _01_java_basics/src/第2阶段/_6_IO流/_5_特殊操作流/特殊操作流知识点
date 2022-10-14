@@ -1,0 +1,291 @@
+特殊操作流目录:
+    标准输入输出流 -->
+        标准输入输出流:
+    打印流 -->
+        打印流:
+        字节打印流:
+        字符打印流:
+    对象的序列化 -->
+        对象序列化流:
+        对象反序列化流:
+        序列化对象和重构对象:
+    Properties集合 -->
+        Properties:
+        Properties集合的特有方法:
+        Properties结合IO流:
+
+标准输入输出流:
+    使用流程:
+        (标准输入流System.in)
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));       //实现Scanner
+            System.out.println("请输入一个整数: ");
+            String str = br.readLine();
+            int i = Integer.parseInt(str);
+            System.out.println(i);
+        (标准输出流System.out)
+             PrintStream ps = System.out;
+             ps.println("java");
+
+    System类中有两个静态的成员变量:
+        public static final InputStream in:
+            标准输入流, 通常该类对应于键盘输入 或 由主机环境或用户指定的的另一个输入源
+        public static final PrintStream out;
+            标准输出流, 通常该类对应显示(打印)输出 或 由主机环境或用户指定的另一个输出目标
+            方便的打印各种值
+
+    Scanner的本质:
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            分析:
+                InputStream in = System.in;         //是一个字节输入流
+                new InputStreamReader(System.in)    //转换为字符流
+                new BufferedReader(new InputStreamReader(System.in));  //缓冲字符流
+
+    System.out的本质:
+        PrintStream ps = System.out;       //System.out本质是一个字节输出流
+        ps.print("java")
+        ps.println("hello")
+
+
+
+打印流:
+    基本说明:
+        打印流只负责打印或输出数据, 不负责读取输入
+        包含有OutputSteam类的write()方法 和 特有的print()方法;
+    字节打印流和字符打印流:
+                字节打印流: PrintStream
+                字符打印流: PrintWriter
+字节打印流:
+    使用流程:
+        PrintStream ps = new PrintStream("data\\打印流.txt");      //public printStream(String fileName)构造方法
+
+        ps.write(97);
+        ps.write("\n".getBytes());
+    基本说明:
+        字节打印流的类是PrintStream
+        使用超类(OutputStream)的write()方法写数据, 查看的时候会转码
+        使用自己的特有方法写数据, 查看的时候数据原样输出
+
+    继承关系:
+        OutPutStream:       //底层字节输出流
+            FilterOutputSteam:
+                PrintStream:
+
+    构造方法:
+        public printStream(String fileName):
+            根据路径字符串创建字节打印流对象
+        public printStream(File file):
+            根据File文件创建字节打印流流对象
+
+字符打印流:
+    使用流程:
+
+        PrintWriter pw = new PrintWriter("data\\pw.txt");                               //PrintWriter(String fileName) 构造方法
+        pw.println("hello\njava");
+        pw.flush();
+        pw.close();
+
+        PrintWriter pw1 = new PrintWriter(new FileWriter("data\\pw1.txt"), true);       //PrintWriter(Writer out, boolean autoFlush) 构造方法
+        pw1.println("hello\njava");                                                     //自动刷新
+        pw1.close();
+
+    基本说明:
+        字符打印流的类PrintWriter
+    继承关系:
+        Object
+            Writer
+                PrintWriter
+    构造方法:
+        PrintWriter(String fileName):
+            使用指定的文件名创建一个新的PrintWriter
+            无法自动执行刷新
+        PrintWriter(Writer out, boolean autoFlush):
+            使用Writer的子类创建一个新的PrintWriter
+            可选择是否自动刷新 autoFlush选择为true
+            autoFlush是一个boolean值:
+                为真:
+                    println()  print()  format() 将自动刷新输出缓冲区
+        PrintWriter(File file):
+            使用文件对象创建一个新的PrintWriter
+
+
+
+对象序列化流:
+    使用流程:
+        (package2.Student)
+        public class package2.Student implements Serializable {      //实现Serializable接口
+            ...;
+        }
+
+        (Demo)
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("data\\package2.Student.txt"));     // ObjectOutputStream(OutputStream out) 构造方法
+
+        package2.Student s = new package2.Student("张辉", 22);
+
+        oos.writeObject(s);                                                                             //使用writeObject(Object o)方法
+    基本说明:
+        对象序列化流 --> ObjectOutputStream
+        一个对象想要被序列化, 该对象所属的类必须是实现了Serializable接口
+        Serializable是一个标记接口, 实现该接口, 不需要重写任何方法!
+    继承关系:
+        Object
+            OutputStream
+                ObjectOutputStream
+    作用:
+        将java对象的原始数据类型和图形写入OutputStream, 可以使用ObjectInputStream读取(重构对象)
+        可以通过用流的文件来实现对象的持久存储, 如果流是网络套接值流, 则可以再另一个主机或进程中重构对象
+    构造方法:
+        ObjectOutputStream(OutputStream out):
+            创建一个写入指定OutputStream的ObjectOutputStream对象
+    序列化对象的方法(成员方法):
+        void writeObject(Object obj):
+            将指定的对象写入ObjectOutputStream:
+
+对象反序列化流:
+    使用流程:
+        public static void main(String[] args) throws IOException, ClassNotFoundException {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("data\\package2.Student.txt"));    //ObjectInputStream(InputStream in) 构造方法
+
+            package2.Student s = (package2.Student) ois.readObject();                                                     //ReadObject()方法; 向下转型为Student; 这里可能有ClassNotFoundException异常, 需要抛出
+            System.out.println(s.getName() + " " + s.getAge());
+        }
+
+    基本说明:
+        对象反序列化流 --> ObjectInputStream
+        返回的是Object对象, 需要向下转型成需要的对象
+
+    继承关系:
+        Object
+            InputStream
+                ObjectInputStream
+    作用:
+        ObjectInputStream反序列化读取先前使用ObjectOutputStream存储或传输的原始数据和对象
+    构造方法:
+        ObjectInputStream(InputStream in):
+            创建一个指定InputStream的ObjectInputStream对象
+    反序列化对象的方法:
+        Object readObject():
+            从ObjectInputStream读取一个对象
+
+序列化对象和重构对象:
+    使用流程:
+        (Student类)
+        public class package2.Student implements Serializable {
+            private static final long serialVersionUID = 88L;       //固定serialVersionUID
+            private String name;
+            private transient int age;                              //transient关键字 不参与序列化 只能修饰变量
+
+            ...;
+        }
+
+        (Demo类)
+        public static void main(String[] args) throws IOException, ClassNotFoundException {
+                //writeObject();
+                readObject();
+        }
+
+        public static void writeObject() throws IOException {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("data\\package2.Student.txt"));     //ObjectOutputStream序列化对象 构造方法
+            package2.Student s = new package2.Student("张辉", 22);
+            oos.writeObject(s);                                                                             //writeObject(Object o)方法
+            oos.close();
+        }
+
+        public static void readObject() throws IOException, ClassNotFoundException {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("data\\package2.Student.txt"));        //ObjectInputStream反序列化流 构造方法
+            package2.Student s = (package2.Student) ois.readObject();                                                         //readObject() 方法, 返回值为Object;  向下转型为存储的对象;
+            System.out.println(s);
+        }
+
+    重要知识点:
+        (1) 序列化一个对象后, 如果修改了对象的类文件, 读取对象将会抛出InvalidClassException异常
+                InvalidClassException:
+                    若待读取的对象所属类被修改,导致serialVersionUID改变, 将抛出该异常
+                    若待读取的对象所属的类没有无参构造方法, 将抛出该异常
+                    若待读取的对象所属该类具有未知的数据类型, 将抛出该异常
+        (2) 待序列化类加一个变量serialVersionIUD, 赋予固定值将不会触发InvalidClassException异常
+                格式为: private static final long serialVersionUID = 42L
+                必须是 static final long 修饰的变量, 建议private
+        (3) 使用transient关键字修饰不准备参与序列化的变量, 使其不参与序列化
+                格式为: private transient int age;
+                transient只能修饰变量;
+
+Properties:
+    使用流程:           //作为Map集合的使用
+        Properties prop = new Properties();     //Properties的元素类只能是Object对象, 无法指定泛型对象
+        prop.put("张辉", 24);
+        prop.put("曹飞雨", 23);
+        prop.put("吴楠", 23);
+
+        Set<Object> keySet = prop.keySet();     //集合遍历
+        for (Object key : keySet) {
+            Object value = prop.get(key);
+            System.out.println(key.toString() + " " + value.toString());
+        }
+    基本说明:
+        Properties的元素类只能是Object对象, 无法指定泛
+        Properties是一个Map体系的集合类
+        Properties可以保存到流中或从流中加载
+
+    继承关系:
+        java.lang.Object
+            java.util.Dictionary<K,V>
+                java.util.Hashtable<Object,Object>
+                    java.util.Properties
+
+Properties集合的特有方法:
+    使用流程:
+        Properties prop = new Properties();
+        prop.setProperty("张辉", "24");                           //setProperty(String key, String value)方法
+        prop.setProperty("曹飞雨", "23");
+        prop.setProperty("吴楠", "24");
+
+        Set<String> keySet = prop.stringPropertyNames();        //StringPropertyNames()方法
+        for (String key : keySet) {
+            String value = prop.getProperty(key);               //getProperty(String key)方法
+            System.out.println(key + "," + value);
+    方法概述:
+        Object setProperty(String key, String value):
+            注意参数是字符串对象, 返回一个Object对象
+            设置集合的key和value, 参数都是String类型
+            底层调用的是Hashtable的put方法
+        String getProperty(String key):
+            根据key获取value值, 相当于Map中的get(T key)
+        Set<String> StringPropertyNames():
+            获得一个KeySet集合, 相当雨Map中的KeySet()方法
+
+Properties结合IO流:
+    使用流程:
+        Properties prop = new Properties();                     //public Properties()构造方法
+
+        prop.setProperty("张辉", "24");
+        prop.setProperty("曹飞雨", "23");
+        prop.setProperty("吴楠", "23");
+
+        FileWriter fw = new FileWriter("data\\prop.txt", true);
+
+        prop.store(fw, "package2.Student message");                      //void store(Writer writer, String comments)方法
+
+        fw.write("#test");
+
+
+        prop.load(new FileReader("data\\Prop.txt"));           //void load(Reader reader)方法
+        System.out.println(prop.toString());
+
+        prop.clone();
+    基本说明:
+        可一次性存储或读取大量键值对
+    方法概述:
+        Properties结合字节流:
+            Void load(InputStream in):
+                从字节输入流中读取属性列表(键值对列表)
+            Void Store(OutputStream out, String comments):
+                将字节输出流OutputStream加载到Properties流中, 以适合load(InputStream in)方法读取的格式写入输出字节流
+                comments: 注释, 不能为中文
+                文件若有内容, 则追加写入
+        Properties结合字符流:
+            void load(Reader reader):
+                从字符输入流中读取属性列表(键值对列表)
+            void store(Writer writer, String comments):
+                将字符输出流Writer加载到Properties流中, 以适合load(Writer writer)方法读取的格式写入字符输出流
+                comments: 注释, 不能为中文
+                文件若有内容, 则追加写入

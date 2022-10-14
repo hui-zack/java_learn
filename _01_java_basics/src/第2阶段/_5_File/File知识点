@@ -1,0 +1,154 @@
+File知识点目录:
+    FIle -->
+        File的构造方法:
+        File的创建功能:
+        File的获取功能:
+        File的删除功能:
+        递归:
+        递归遍历目录
+File:
+    基本说明:
+        路径和文件名是可以通过File类封装成对象的
+        构造方法创建的不是一个真实存在的文件, 仅仅是一个路径名
+
+构造方法:
+    使用流程:
+        File file1 = new File("D:\\user\\work\\java.txt");          //构造1
+
+        File file2 = new File("D:\\user\\work", "java.txt");        //构造2
+
+        File file_parent = new File("D:\\user\\work");
+        File file3 = new File(file_parent, "java.txt");             //构造3
+
+    方法概况:
+        File(String pathname):
+            使用路径文件名字符串来创建File实例
+        File(String parent, String child):
+            使用路径字符串和文件名字符串创建新的File实例
+        File(File parent, String child)
+            使用父抽象路径名和子路径名字符串创建新的File实例
+
+创建功能:
+    使用流程:
+        File f1 = new File("D:\\user\\work\\space\\java.txt");
+        System.out.println(f1.createNewFile());             //creatNewFile方法 (注意需要抛出异常)
+
+        File f2 = new File("D:\\user\\work\\space\\javaSE");
+        System.out.println(f2.mkdir());                     //mkdir方法
+
+        File f3 = new File("D:\\user\\work\\space\\javaWEB\\html");
+        System.out.println(f3.mkdirs());                    //mkdirs方法
+    方法概述:
+        public boolean creatNewFile()
+            创建一个文件, 必须是已经存在的目录或文件夹
+        public boolean mkdir()
+            创建一个单极目录, 只能创建单机目录
+        public boolean mkdirs()
+            创建一个多级目录
+
+获取功能:
+    使用流程:
+        File f1 = new File("D:\\user\\work\\space\\java.txt");
+
+        System.out.println(f1.isDirectory());               //isDirectory()方法
+        System.out.println(f1.isFile());                    //isFile()方法
+        System.out.println(f1.exists());                    //exists()方法
+        System.out.println("-----------------");
+
+        System.out.println(f1.getAbsolutePath());           //getAbsolutePath()方法
+        System.out.println(f1.getPath());                   //getPath()方法
+        System.out.println(f1.getPath());                   //getPath()方法
+        System.out.println("-----------------");
+
+        File f2 = new File("D:\\user\\work\\space");
+        for (String str : f2.list()) {                      //list()方法
+            System.out.println(str);
+        }
+        System.out.println("-----------------");
+
+        for (File file : f2.listFiles()) {                  //listFiles()方法
+            if (file.isFile()) {
+                System.out.println(file.getName());
+            }
+        }
+    方法概述:
+        public boolean isDirectory()
+            判断是否是目录
+        public boolean isFile()
+            判断是否是文件
+        public boolean exists()
+            判断文件是否存在
+
+        public String getAbsolutePath()
+            返回绝对路径
+        public String getPath()
+            返回创建时的路径 (相对路径)
+        public String getName()
+            返回文件或目录的名称
+
+        public String[] list()
+            返回目录下目录或文件的列表 元素为String类型
+        public File[] listFiles()
+            返回目录下目录或文件的列表 元素是File类型
+
+删除功能:
+    使用流程:
+        File f1 = new File("tmp");
+        System.out.println(f1.mkdir());
+        File f2 = new File("tmp\\java.txt");
+        System.out.println(f2.createNewFile());
+
+        System.out.println("--------");
+
+        System.out.println(f1.delete());        //delete()方法 目录含内容->false
+        System.out.println(f2.delete());        //delete()方法 删文件   -> true
+        System.out.println(f1.delete());        //delete()方法 删空目录  -> true
+    基本说明:
+        如果目录中有内容, 不能直接删除, 先删除内容, 再删除目录
+        若要删除的文件或目录存在, 返回false
+
+    方法概述:
+        public boolean delete()
+            删除由此抽象路径名表示的文件或目录
+
+    绝对路径和相对路径:
+        绝对路径:
+            完整的路径名, 不需要任何其他细心就可以定位它所表示的文件 D:\\user\\home
+        相对路径:
+            必须使用其他路径名的信息进行解释 如: home
+
+递归:
+    使用流程:
+        public static int f(int n) {             //递归求不死神兔
+            if (n == 1 || n == 2) {         //程序出口
+                return 1;
+            } else {
+                return f(n -1) + f(n - 2);  //内部调用
+            }
+        }
+
+    基本说明:
+        在方法定义中调用方法本身的现象
+        递归使用少量程序就能解决出解体过程中所需要的多次重复计算
+
+    递归出口:
+        没有递归出口就会导致内存溢出
+    递归规则:
+        与原问题相似的规模较小的问题
+
+递归遍历目录:
+    使用流程:
+        public static void getAllFile(File srcFile) {                   //递归遍历目录
+            File[] listFiles = srcFile.listFiles();
+            if (listFiles != null) {
+                for (File file : listFiles) {
+                    if (file.isDirectory()) {
+                        getAllFile(file);                               //内部调用
+                    } else {
+                        System.out.println(file.getAbsolutePath());     //出口
+                    }
+                }
+            }
+        }
+
+

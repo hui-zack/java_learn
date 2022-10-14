@@ -1,0 +1,22 @@
+idea安装: 上网搜
+idea快捷键:
+    方便写代码的:
+        快速生成main():
+            psvm 回车
+        快速生成输出语句:
+            sout 回车
+        内容提示代码补全:
+            Ctrl+Alt+space
+        返回上一步:
+            Ctrl+z
+    注释:
+        单行注释:
+            Ctrl+/
+        多行注释:
+            Ctrl+Shift+/
+    格式化:
+        Ctrl+Alt+l
+
+
+
+

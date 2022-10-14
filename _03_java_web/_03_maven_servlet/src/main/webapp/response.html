@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <!---->
+    <script>
+        // --> [点击图片切换验证码]
+
+
+        /**
+         * 函数功能: 每次点击图片, 修改img标签的src属性, 使其请求/checkCode (servlet)
+         * */
+        window.onload = function () {                      // 页面加载后执行函数-
+            var img = document.getElementById("check");
+            img.onclick = function () {                    // 绑定单机时间
+                var date = new Date().getTime();           // 获取时间戳
+                img.src = "/checkCode?" + date;            // 添加无效参数, 防止请求被执行为浏览器的本地请求
+
+            }
+        }
+
+        /**
+         * 函数功能: 每次点击超链接, 修改a标签的href属性, 使其重新转移到本页面, 间接实现页面刷新以修改验证码
+         * */
+        window.onload = function () {                     // 页面加载后执行函数-
+            var a = document.getElementById("change");
+            a.onclick = function () {                     // 绑定单机时间
+                var date = new Date().getTime();          // 获取时间戳
+                a.href = "/checkCodeTest.html"           // 添加无效参数, 防止请求被执行为浏览器的本地请求
+
+            }
+        }
+
+/*
+        /!**
+         * 函数功能: 每次点击超链接修改img的src属性, 使其请求/checkCode (servlet)
+         * *!/
+        window.onload = function () {                     // 页面加载后执行函数-
+            var a = document.getElementById("change");
+            var img = document.getElementById("check")
+            a.onclick = function () {                     // 绑定单机时间
+                var date = new Date().getTime();          // 获取时间戳
+                img.src = "/checkCode?" + date;           // 添加无效参数, 防止请求被执行为浏览器的本地请求
+
+            }
+        }
+*/
+
+    </script>
+</head>
+<body>
+    <img id = "check" src = "/checkCode">                    <!--注意: src = "/checkCode"是一个servlet!!!-->
+    <a id="change" href="">看不起换一张?</a>
+</body>
+</html>

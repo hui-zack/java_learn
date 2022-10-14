@@ -1,0 +1,348 @@
+注解知识点:
+    注解基础 -->
+        注解:
+        生成javadoc文档:
+        jdk内置注解:
+    自定义注解 -->
+        注解类:
+        注解属性的返回值类型:
+        注解属性的赋值:
+        元注解:
+            @Target(ElementType.TYPE)                       //指定被定义注解 的作用域为修饰类
+            @Retention(RetentionPolicy.ClASS)               //指定被定义注解 保留到jvm加载后
+            @Documented                                     //指定被定义注解 可以抽取到API文档中
+            @Inherited
+    注解解析:
+    简单的测试框架案例:
+
+
+
+
+注解:
+    说明:
+        JDK1.5之后的新特性, 用来说明程序
+        根据作用分为3类
+    注解作用分类:
+        (1) 编写文档: 注解生成JDK9这样的文档, 命令: javadoc 类名.java
+        (2) 代码分析: 反射分析代码
+        (3) 编译检查: 进行编译检查如Override
+    工作中的注解:
+        工作中一般使用注解, 而不是自定义注解
+        注解使用:
+           编译器根据注解进行编译检查
+           注解用来解析程序
+        注解不是程序的一部分, 注解相当于一个标签
+
+生成javadoc文档:
+    使用流程:
+        (终端执行 代码去掉包声明)
+        javadoc Calculator.java
+
+        (Calculator类)
+        /**                                         // /**生成
+         * 注解javadoc演示
+         *
+         * @author Hui
+         * @version 1.0
+         * @since 1.5
+         * */
+
+        public class Calculator {                   //类声明
+            /**
+             *
+             * @param a 整数a
+             * @param b 整数b
+             * @return a和b的和
+             */
+            public int add(int a, int b) {
+                return a + b;
+            }
+        }
+    基本说明:
+
+JDK内置注解:
+    说明:
+        常见的内置注解有三个:
+            @override                       --> 重写安全检查
+            @Deprecated                     --> 提示过时
+            @SuppressWarnings("all")        --> 压制警告, 可修饰方法也可以修饰类
+
+
+注解类:
+    使用流程:
+        public @interface Ann {
+
+        }
+
+    基本说明:
+        注解其实是一个继承Annotation类的接口
+        注解的属性指的接口中的抽象方法
+
+    注解类声明格式:
+        简化格式:
+            public @interface 注解名{
+                ...;
+            }
+        完全格式:
+            public interface MyAnn extends Annotation{
+                ...;
+            }
+
+注解属性的返回值类型:
+    使用流程:
+        (Ann1 注解类, 注解属性的返回值类型)
+        public @interface Ann1 {
+            int show1();            //基本数据类型
+
+            String show2();         //String
+
+            Person show3();         //枚举类
+
+            Ann show4();            //注解, Ann是另一个包的注解
+
+            String[] per();         //以上四种的数组
+        }
+
+        (Person 枚举类)
+        public enum Person {
+            p1, p2;
+        }
+
+    基本说明:
+        注解属性的返回值类型  -->  只有五种
+
+    注解属性返回值类型只能是如下五种:
+        基本数据类型
+        String
+        枚举              --> public enum Person{}
+        注解
+        以上类型的数组
+
+注解属性的赋值:
+    使用流程:
+        (Ann2UDemo)
+        public class Ann2Demo {
+
+            @Ann2("java")                                   //仅一个属性需要赋值,且属性名未value; 使用注解
+            public void method(){
+                System.out.println();
+            }
+
+        }
+
+
+        (Ann2 注解类)
+        public @interface Ann2 {
+            String value();
+
+            int number() default 12;                        //default 设置默认值
+
+            Person per() default Person.p1;                 //Person是一个枚举类
+            Ann returnAnn() default @Ann();                 //Ann是一个注解
+
+            String[] array() default {"jdk-15.02", "jvm"};
+        }
+    基本说明:
+        注解属性的理解:
+            对于注解类来说是类中的抽象方法
+            对外部使用者来说是属性值
+
+    注解属性赋值:
+        说明:
+            使用注解时, 未default默认值的属性, 需要在使用时赋值
+        格式:
+            @Ann2(属性名 = 值)
+        实例:
+            注解属性的返回值为:
+                基本数据类型:
+                    @Ann2(number = 15)
+                String:
+                    @Ann2(str = "java")
+                枚举:
+                    @Ann2()
+                注解:
+                    @Ann2(returnAnn = @Ann)
+                以上类型的数组(如 String[]):
+                    @Ann2(array = "java", "world")
+
+    default设置默认值:
+        说明:
+            在注解类中, 属性加default来设置默认值:
+        格式:
+            数据类型 属性名() default 值
+        实例:
+            实例1:
+                int number() default 12;
+            实例2:
+                Person per() default Person.p1;
+            实例3:
+                Ann returnAnn() default @Ann();
+            实例4:
+                String[] array() default {"jdk-15.02", "jvm"};
+
+    省略场景:
+        只有一个属性需要赋值, 且属性名称是value, 可直接定义值, 如:
+            @Ann2("all")
+        数组赋值时, 只有一个元素, 可省略{}号
+            @Ann2({"start"})  --> @Ann2("start")
+
+元注解:
+    使用流程:
+        @Target(ElementType.TYPE)                       //指定被定义注解 的作用域为修饰类
+        @Retention(RetentionPolicy.ClASS)               //指定被定义注解 保留到jvm加载后
+        @Documented                                     //指定被定义注解 可以抽取到API文档中
+        @Inherited                                      //指定被定义注解 该注解类修饰的类, 其子类继承该注解
+
+        public @interface Ann3 {
+
+            String method();
+        }
+    基本说明:
+        熟悉4个常用元注解的作用和使用方法
+        元注解是:
+            用来描述注解类的, 放在类声明的上方用
+            是用来描述注解的注解
+
+    常用的元注解:
+        @Target(ElementType.TYPE)
+            指定定义的注解 是用来修饰类的, 还是用来修饰变量或方法的
+
+            参数ElementType是一个枚举, 枚举值如下:
+                TYPE:
+                    表示定义的注解可用来修饰类
+                METHOD:
+                    表示定义的注解可用来修饰方法
+                FIELD:
+                    表示定的注解可用来修饰变量
+
+        @Retention(RetentionPolicy.RUNTIME)
+            描述定义的注解 将被保留到的阶段
+
+            参数RetentionPolicy是一个枚举, 枚举值如下:
+                SOURCE:
+                    仅在源码阶段保留
+                ClASS:
+                    保留到字节码阶段, 但jvm加载class文件时被遗弃
+                RUNTIME:
+                    保留到字节码阶段, jvm记载后class文件后仍存在
+
+        @Documented:
+            指定定义的注解 被抽取到API文档中
+            无参注解
+        @Inherited
+            指定定义的注解, 修饰完一个类后, 继承了该类的子类将继承该注解
+            无参注解
+
+解析注解 -->
+
+获取注解属性值的方法:
+    使用流程:
+        (Demo)
+
+        @ConfigFile(className = "第4阶段._3_反射搭建框架结构._3_根据配置文件调用任意方法.People", method = "eat")        //注解存放信息
+        public class ConfigFileDemo {
+            public static void main(String[] args) throws Exception {
+
+                Class<ConfigFileDemo> cls = ConfigFileDemo.class;                                        //获取class对象
+                ConfigFile config = cls.getAnnotation(ConfigFile.class);
+                    /*
+                    getAnnotation(Class<A> annotationClass)方法, 返回本类中的注释ConfigFile对象;
+                    */
+
+
+                String className = config.className();                                                    //注解对象调用注释类抽象方法
+                String method = config.method();
+
+
+                Class<?> aClass = Class.forName(className);                                              //反射配置对象
+                Constructor<?> con = aClass.getDeclaredConstructor();
+                con.setAccessible(true);
+                Object obj = con.newInstance();
+
+
+                Method me = aClass.getDeclaredMethod(method);                                            //反射注解方法
+                me.invoke(obj);
+
+            }
+        }
+
+       (@ConfigFile 注释类)
+
+       @Target({ElementType.TYPE, ElementType.METHOD})                                          //注解修饰位置: 类声明上方
+       @Retention(RetentionPolicy.RUNTIME)                                                      //注解内容保留到: 编译后
+       public @interface ConfigFile {
+           String className();
+           String method();
+       }
+
+    基本说明:
+        注解解析 == 获取注解的属性值
+        注解对象调用注解类的抽象方法:
+           内存中自动生成一个实现注解类的实现类
+           实现类中重写注解类中的方法, 返回注解的属性值
+
+
+
+    getAnnotation(Class<A> annotationClass):
+        返回 顶部注解类的对象
+        Class类, Method类, Field类都含有该方法
+
+    获取注解属性值的流程:
+        1. 反射获取被修饰类的class, Method或Field的对象:
+            Class<ConfigFileDemo> cls = ConfigFileDemo.class;
+                //示例的注解用来存放路径, 在demo上方
+
+        2. 调用getAnnotation(注解名.class)获取注解类对象:
+            configFile config = cls.getAnnotation(ConfigFile);
+
+        3. 注解类对象ann调用注解类中的静态方法获取注解属性值
+            String className = config.className();
+            String method = config.method();
+
+简单的测试框架案例:
+    使用流程:
+        (Demo)
+        Calculator cal = new Calculator();
+        Class<? extends Calculator> cls = cal.getClass();
+
+        int number;
+        BufferedWriter bw = new BufferedWriter(new FileWriter("bug.txr"));
+        Method[] methods = cls.getMethods();
+        for (Method me : methods) {
+            if (me.isAnnotationPresent(Check.class)) {                                    //Method类的boolean isAnnotationPresent(Check.class)方法, 判断是否被Check注解修饰
+                try {
+                    me.invoke(cal);
+                } catch (Exception e) {
+                    bw.write("异常位置: " + me.getName());                                  //Method类的getName()方法, 返回方法名称
+                    bw.newLine();
+                    bw.write("异常的名称: " + e.getCause().getClass().getSimpleName());      //Exception类的getCause()方法,
+                    bw.newLine();
+                    bw.write("异常的原因: " + e.getCause().getMessage());
+                    bw.newLine();
+                    bw.flush();
+                }
+            }
+        }
+        bw.write("----------------------------");
+        bw.close();
+    基本说明:
+        简单的单元测试架构
+        Method类的:
+            getName()方法
+            isAnnotationPresent(Check.class)方法
+        Exception类的使用:
+            获取异常原因: e.getCause().getMessage():
+            获取异常名称: e.getCause().getClass().getSimpleName():
+
+    Method类的成员方法:
+        String getName():
+            返回 方法的名称
+        Boolean isAnnotationPresent(Class AnnotationClass):
+            判断 是否被AnnotationClass注解修饰
+    Exception类的使用:
+        获取异常原因:
+            e.getCause().getMessage():
+                返回一个String
+        获取异常名称:
+            e.getCause().getClass().getSimpleName():
+                返回一个String

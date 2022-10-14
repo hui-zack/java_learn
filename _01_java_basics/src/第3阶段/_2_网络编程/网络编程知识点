@@ -1,0 +1,344 @@
+网络编程知识点目录:
+    网络编程基础知识:
+    网络编程三要素:
+    InetAddress类:
+
+    UDP -->
+        UDP通信:
+        UDP发送数据:
+        UDP接受数据:
+    TCP -->
+        TCP通信:
+        TCP发送数据:
+        TCP接收数据:
+        解决程序等待问题:
+
+网络编程基础知识:
+    计算机网络:
+        将地理位置不同的具有独立功能的多台计算机及外部设备, 通过通信线路连接起来.
+        在网络操作系统, 网络管理软件及通信协议的管理和协调下, 实现资源共享和信息传递的计算机系统
+    网络编程:
+        在网络通信协议下, 实现网络互联的不同计算机上运行的程序间数据交换
+
+    网络编程三要素:
+        IP地址:
+            识别计算机
+        端口:
+            识别应用程序
+        通信协议:
+            在计算机网络中, 计算机间连接和通信的规则被称为网络通信协议
+            通信协议对数据的传输格式, 传输速率, 传输步骤等做了同一规定, 通信双方必须同时遵守才能完成数据交换
+            创建的协议有UDP协议, TCP协议等
+网络编程三要素:
+    IP地址:
+        IP分类:
+            IPv4: 32bit  采用十进制点分法
+            IPv6: 128bit, 16bit一组, 分成八组十六进制数
+        特殊IP地址:
+            127.0.0.1:
+                回送地址, 可以代表本机地址, 一般用来测试使用
+
+    端口:
+        端口:
+            设备上应用程序的唯一标识
+        端口号:
+            用两个字节标识的整数
+            取值范围0~65535, 其中0~1023用于一些知名的网络服务和应用, 普通的应用程序需要使用1024以上的端口号
+            若端口号被另外轶哥服务或应用占用, 会导致当前程序启动失败
+
+    协议:
+        计算机网络中, 连接和通信的规则被称为网络通信协议
+    UDP协议:
+        基本说明:
+            用户数据报协议
+            发送端和接受端不讲理数据连接
+            发送重要数据不建议使用UDP协议
+
+        详细说明:
+            全名为: 用户数据报协议(User Datagram Protocol)
+            UDP在数据传输时, 发送端和接受端不建立数据连接.
+                即发送端不会确认接受端是否存在, 就会发送数据
+                接收端收到数据后, 也不会向发送端反馈是否收到数据
+            使用UDP协议消耗资源小, 通信效率高, 通常用于音频, 视频, 和普通数据的传输
+                视频会议使用UDP协议, 偶尔丢失一两个数据报, 也不会对接受结果产生太大影响
+                UDP的面向无连接性, 无法保证数据的完整性, 因此在传输重要数据时不建议使用UDP协议
+
+    TCP协议:
+        基本说明:
+            TCP->传输控制协议
+            三次握手: 在吗? 在! 好的
+        详细说明：
+            全名为: 传输控制协议(Transmission Control Protocol)
+            TCP是面向连接的通信协议
+                传输数据之前, 先在发送端和接受端建立逻辑连接, 之后再传输数据
+                提供了两台计算机之间可靠无差错的数据传输
+                TCP连接中心必须要明确客户端和服务器端
+
+            客户端向服务器端发送连接请求, 每次连接的创建都需要经过三次握手
+
+            完成三次握手, 连接建立后, 客户端和服务端就可以进行数据传输了
+                 由于这种面向连接的特性, TCP协议可以确保传输数据的安全性, 应用十分广泛
+                 常用于上传文件, 下载文件, 浏览网页等
+
+        三次握手:
+            第一次握手: 客户端向服务端发送连接请求, 等待服务器确认
+            第二次握手: 服务端向客户端回送一个响应, 通知客户端接受到了连接请求
+            第三次握手: 客户端再次向服务端发送确认信息, 确认连接
+
+
+InetAddress类:
+    使用流程:
+        InetAddress host = InetAddress.getByName("192.168.43.50");
+
+        System.out.println(host.getHostAddress());
+        System.out.println(host.getHostName());
+
+    基本说明:
+        用于创建Host对象, 具有IP地址的获取和操作功能
+    获取对象:
+        无构造方法, 提供了一个静态方法创建当前主机对象  -> InetAddress.getByName(String host)
+
+        static InetAddress getByName(String host):
+            参数为IP地址或主机名
+            获取主机host对象
+            可通过getHostName()获取主机名
+            通过getHostAddress()获取IP地址
+
+    成员方法:
+        String getHostName():
+            获取此主主机的主机名
+        String getHostAddress()
+            返回文本显示中的IP地址字符串
+
+UDP通信:
+    基本说明:
+        java提供DatagramSocket类作为基于UDP的Socket
+    UDP通信原理:
+        UDP是一种不可靠的网络协议, 在通信的两端各建立一个Socket对象
+        发送数据的Socket只负责发送, 不提供反馈信息
+        接受数据的Socket只负责接受, 不提供反馈信息
+
+    DatagramSocket类:
+        构造方法:
+            public DatagramSocket():
+                创建一个Socket对象, 随机绑定一个本机的可用端口
+                一般用于发送端
+            public DatagramSocket(int port):
+                创建一个Socket对象, 并绑定本机上的port端口
+                一般用于接收端
+        成员方法:
+            void send(DatagramPacket p):
+                参数为数据报包对象 --> DatagramPacket p
+                    使用DatagramPacket(byte[] buf, int length, InetAddress address, int port)构造实包
+                接受数据包
+            void receive(DatagramPacket p):
+                参数书数据包对象 --> DatagramPacket p
+                    使用DatagramPacket(byte[] buf, int length)构造空包
+
+            void close():
+                关闭发送端
+
+    DatagramPacket类:
+        作用:
+            用于创建数据报包对象
+        构造方法:
+            DatagramPacket(byte[] buf, int length, InetAddress address, int port):
+                作用:
+                    构造实包 --> 含有数据的数据报包对象, 一般用在发送端
+                    将内容为buf, 长度为length的数据报包发送到地址为address, 端口port的主机
+                参数:
+                    byte[] buf: 发送的内容
+                    int length: 内容的长度
+                    InetAddress address: 接受端的主机Host
+                    int port: 接收端的端口
+            DatagramPacket(byte[] buf, int length)
+                构造空包 --> 指定了长度的数据报包对象 数据为空, 一般用在接收端
+        成员方法:
+            Byte[] getData():
+                返回数据报包字节数组, 该字节数组位于数据缓冲区中
+            int getLength():
+                返回数据报包的长度
+
+UDP发送数据:
+    使用流程:
+        DatagramSocket ds = new DatagramSocket();                                                                   //DatagramSocket() 发送端构造方法
+
+        byte[] bys = "hello, UDP send, \"我来了".getBytes();
+        DatagramPacket p = new DatagramPacket(bys, bys.length, InetAddress.getByName("192.168.1.86"), 10086);       //DatagramPacket(byte[] buf, int length, InetAddress address, int port) 数据报包构造方法
+
+        ds.send(p);                                                                                                 //send(DatagramPacket p) 发送端成员方法
+
+        ds.close();                                                                                                 //close() 发送端成员方法
+
+    基本说明:
+        使用构造方法DatagramSocket()创建一个发送端对象ds,
+        使用构造方法DatagramPacket(byte[] buf, int length, InetAddress address, int port), 创建数据报包对象p
+        调用ds的send(DatagramPacket p)方法将数据包p发送出去
+        调用ds的close()方法关闭发送端
+
+
+
+        成员方法:
+            Byte[] getData():
+                返回数据报包字节数组
+            int getLength():
+                返回数据报包的长度
+    UDP发送数据流程:
+        (1) 创建发送端的Socket对象
+            DatagramSocket ds = new DatagramSocket();
+        (2) 创建数据包对象
+            byte[] bys = "hello, UDP send, \"我来了".getBytes();
+            DatagramPacket p = new DatagramPacket(bys, bys.length, InetAddress.getByName("192.168.1.86"), 10086);
+        (3) 调用发送端Socket对象的send(DatagramPacket p)发动数据
+            ds.send(p);
+        (4) 关闭发送端
+            ds.close();
+UDP接受数据:
+    使用流程:
+        DatagramSocket ds = new DatagramSocket(8999);                   //构造方法DatagramSocket(port) 接收端Socket对象
+
+        byte[] bys = new byte[1024];
+        DatagramPacket p = new DatagramPacket(bys, bys.length);         //构造方法DatagramPacket(bys, bys.length) 空数据报包对象
+
+        ds.receive(p);                                                  //接收端Socket的receive(DatagramPacket p)方法
+
+        System.out.println(new String(p.getData(), 0, p.getLength()));  //构造方法String(byte[] buf, int offset, int length);
+                                                                        //数据报包的byte[] getData()方法, int getLength()方法
+
+    基本说明:
+        使用DatagramSocket(int port)创建接收端Socket对象
+        使用DatagramPacket(byte[] buf, int length)创建空数据报包对象
+        数据报包对象含有byte[] getData()方法, int getLength()方法
+
+    UDP接收数据报包流程:
+        (1) 创建接收端Socket对象
+            DatagramSocket ds = new DatagramSocket(8999)
+        (2) 创建一个空数据报包, 用于接收数据
+            byte[] bys = new byte[1024];
+            DatagramPacket p = new DatagramPacket(bys, bys.length);
+        (3) 调用Socket对象的receive(DatagramPacket p)方法, 将数据接收到空数据报包
+            ds.receive(p);
+        (4) 调用数据报包的getData()和getLength()方法, 将数据解析到控制台
+            System.out.println(new String(p.getData(), 0, p.getLength()));
+        (5) 关闭接收端
+            ds.close()
+
+TCP通信:
+
+    基础知识:
+        java为客户端提供了Socket类, 为服务端提供了ServerSocket类
+        通过Socket产生IO流进行网络通信
+        TCP通信协议是一种可靠的网络协议, 它在通信的两端各建立一个Socket对象, 构成网络虚拟链路
+        java对基于TCP协议的网络提供了良好的封装, 使用Socket对象来代表两端通信的端口
+    Socket类:
+        构造方法:
+            public Socket(InetAddress address, int port):
+                创建客户端Socket对象, 并指定接收端Host和端口
+            public Socket(String address, int port):
+                创建客户端Socket对象, 并指定接收端Host和端口
+                内部其实也是InetAddress, 这里简化了步骤
+        成员方法:
+            OutputStream getOutputStream():
+                返回一个底层字节输出流
+            InputStream getInputStream():
+                返回一个底层字节输入流
+
+    ServerSocket类:
+        构造方法:
+            public ServerSocket(int port):
+                创建服务端ServerSocket对象, 并指定本机接收端口
+        成员方法:
+            Socket accept():
+                返回一个解析后的Socket对象, Socket对象的getInputStream方法可返回底层字节输入流
+
+TCP发送数据:
+    使用流程:
+        Socket s = new Socket("192.168.0.199", 9776);   //构造方法 public Socket(String address, int port):
+
+        OutputStream os = s.getOutputStream();          //getOutputStream()方法
+        os.write("TCP 我来了!!".getBytes());
+
+        s.close();                                      //close()方法
+
+    基本说明:
+        使用Socket类创建发送端Socket对象
+        Socket对象可调用getOutputStream()和getInputStream()方法
+
+
+    发送数据流程:
+        (1) 创建客户端的Socket对象
+            Socket s = new Socket("192.168.0.199", 9776);
+        (2) 获取输出流, 写数据
+            OutputStream os = s.getOutputStream();
+            os.write("TCP 我来了!!".getBytes());
+        (3) 释放资源
+            s.close();
+
+TCP接收数据:
+    使用流程:
+        ServerSocket ss = new ServerSocket(9776);           //构造方法ServerSocket(int port)
+
+        Socket s = ss.accept();                             //ServerSocket的accept()方法
+
+        InputStream is = s.getInputStream();                //Socket的getInputStream()方法
+
+        byte[] bys = new byte[1024];
+        int len;
+        while ((len = is.read(bys)) != -1) {
+            System.out.println(new String(bys, 0, len));
+        }
+
+        s.close();
+        ss.close();
+
+    基本说明:
+        先获取ServerSocket对象ss, 通过accept()方法, 返回服务端Socket对象s
+        服务端Socket对象调用getInputStream()方法, 返回底层字节输入流对象
+        字节输入流读客户端发送的数据
+    TCP接收数据的流程:
+        (1) 创建服务器端的Socket对象
+            ServerSocket ss = new ServerSocket(9776);
+        (2) 监听客户端连接, 返回一个Socket对象
+            Socket s = ss.accept();
+        (3) 获取输入流, 读数据, 将数据显示在控制台
+            InputStream is = s.getInputStream();
+
+            byte[] bys = new byte[1024];
+            int len;
+            while ((len = is.read(bys)) != -1) {
+                System.out.println(new String(bys, 0, len));
+            }
+        (4) 释放资源
+            s.close()
+            ss.close()
+
+解决程序等待问题:
+    使用流程:
+        (ClientDemo)
+        BufferedReader br = new BufferedReader(new FileReader("data\\LiBai.txt"));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            bw.write(line);
+            bw.newLine();
+            bw.flush();
+        }
+
+        s.shutdownOutput();                                                                     //Socket对象的shutdownOutput()方法, 传输数据输出结束标记
+
+        BufferedReader brClient = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        line = brClient.readLine();
+        System.out.println(line);
+    基本说明:
+        在每次发送数据后最好都用shutdownOutput()方法标记发送结束
+        Client发送数据后立即释放资源, Server就知道发送结束, 不会等待
+        Client发送完数据后, 立即调用Socket对象的结束标记方法shutdownOutput(), Server就知道发送结束, 不会等待
+    public void shutdownOutput():
+        Socket对象的结束标记方法
+        在每次发送数据后最好都用该方法标记结束
+        用来告知Server数据的发送已经到达结尾
+
+
+
+

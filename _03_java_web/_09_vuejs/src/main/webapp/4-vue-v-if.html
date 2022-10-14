@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <!--
+        v-if    如果条件满足就展示对应的标签
+        v-show  和v-if一致, 内部写条件判断语句
+    -->
+    <div v-if="count == 1"> 今天 </div>
+    <div v-if="count == 2"> 明天 </div>
+    <div v-show="count == 3"> 后天 </div>
+
+    <input v-model="count">
+</div>
+
+<script src="js/vue.js"></script>
+<script>
+
+    //1. 创建Vue核心对象
+    new Vue({
+        el:"#app",
+        data(){
+            return {
+                username:"",
+                url:"https://www.baidu.com",
+                count:2
+            }
+        },
+        methods:{
+            show(){
+                alert("我被点了...");
+            }
+        }
+    });
+
+</script>
+
+
+</body>
+</html>

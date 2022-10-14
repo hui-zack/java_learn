@@ -1,0 +1,64 @@
+DML知识点目录:
+        添加数据:
+        删除数据:
+        修改数据:
+
+DML知识点框架:
+    添加数据:
+        insert into stu(id, NAME, age) values(001, "张辉", 25);                # 在stu表插入一条数据, 只在id, name, age列添加列值
+        insert into stu values("001", "赵敏", 22, null, null, null);           # 在stu表添加一条数据, 所有列添加列值; 没列值的用null代替
+
+    删除数据:
+        delete from stu where id = 1;                                         # 删除id为1的所有条数据
+        delete from stu;                                                      # 删除全部条数据; 逐条删除
+        truncate table stu;                                                   # 删除全部条数据; 删表后建一个相同结构的表
+
+    修改数据:
+        update stu set id = 2, score = 99.9 where name = "赵敏";               # 修改stu表name为"赵敏"的列, id值改为2, score值改为99.9
+        update stu set id = 2;                                                # 修改stu表, 将所有条数据的id值改为赵敏
+
+DML:
+    用来增删改表中数据
+
+添加数据:
+    使用流程:
+        (SQL yog)
+            insert into stu(id, NAME, age) values(001, "张辉", 25);                # 在stu表插入一条数据, 只在id, name, age列添加列值
+            insert into stu values("001", "赵敏", 22, null, null, null);           # 在stu表添加一条数据, 所有列添加列值; 没列值的用null代替
+    基本说明:
+        DML添加数据
+        列名和value要一一对应
+
+    命令详解:
+        insert into 表名称(列名称1, 列名称2, 列名称3) values(数据1, 数据2, 数据3);
+            在指定表的指定列中 添加数据
+删除数据:
+    使用流程:
+        delete from stu where id = 1;                                         # 删除id为1的所有条数据
+        delete from stu;                                                      # 删除全部条数据; 逐条删除
+        truncate table stu;                                                   # 删除全部条数据; 删表后建一个相同结构的表
+    基本说明:
+        DML删除数据 3条命令
+    命令详解:
+        delete from 表名 [where 条件];
+            删除指定表 符合条件的单条/多条数据
+        delete from 表名;
+            删除指定表 全部数据; 逐条删除
+            速度慢, 不建议使用
+        truncate table 表名;
+            删除指定表 全部数据; 删表后建一个相同结构的表
+            速度快
+修改数据
+    使用流程:
+        update stu set id = 2, score = 99.9 where name = "赵敏";               # 修改stu表name为"赵敏"的列, id值改为2, score值改为99.9
+        update stu set id = 2;                                                # 修改stu表, 将所有条数据的id值改为赵敏
+    基本说明:
+        DDM修改数据
+        如果不添加条件, 会把表中的符合要求的列全部修改
+    命令详解:
+        update 表明 set 列1 = 值1, 列2 = 值2 [where 条件];
+            修改指定表 符合条件的单/多条数据, 将指定的列值修改
+
+        update 表明 set 列1 = 值1, 列2 = 值2;
+            修改指定表, 将所有条数据的指定列值修改
+

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <typeAliases>
+        <!--
+        将sql接口包定义在name中后, sql配置文件可以省略该包的书写直接写接口
+            实例:
+                原先: <select id="selectAll" resultType="pojo.User">
+                现在: <select id="selectAll" resultType="User">
+        -->
+        <package name="pojo"/>
+    </typeAliases>
+    
+    <!--
+    environments：配置数据库连接环境信息。可以配置多个environment，通过default属性切换不同的environment
+    -->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <!--数据库连接信息-->
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql:///mybatis?useSSL=false"/>
+                <property name="username" value="root"/>
+                <property name="password" value="root"/>
+            </dataSource>
+        </environment>
+
+        <environment id="test">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <!--数据库连接信息-->
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql:///mybatis?useSSL=false"/>
+                <property name="username" value="root"/>
+                <property name="password" value="root"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+        <!--加载sql映射文件 -->
+
+        <!--
+        第一种方式:
+            先找到resources下xml类型的sql配置文件, 再找到在java目录下对应的sql接口和javabean
+        -->
+        <!--<mapper  resource="mapper/UserMapper.xml"/>-->
+
+        <!--
+        第二种方式:
+            数据库操作接口(比如UserMapper)的路径和名称:
+                和该接口的xml配置文件的目录结构和文件名完全一致
+                例如:
+                    java.mapper.UserMapper.java      接口
+                    resources.mapper.UserMapper.xml  配置文件
+
+            可以使用包扫描配置:
+               这种配置无需具体到文件名称, 路径名称一致的接口和对应的xml在包扫描模式下自动匹配
+        -->
+        <package name="mapper"/>
+
+    </mappers>
+
+
+</configuration>

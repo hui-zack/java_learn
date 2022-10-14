@@ -1,0 +1,243 @@
+IO流小结:
+    字节流 -->
+        字节输入流/标准输入流 InputStream:
+            底层字节输入流 FileInputStream(String name):
+            缓冲字节输入流 BufferedInputStream(FileInputStream in):
+        字节输出流/标准输出类 OutputStream:
+            底层字节输出流 FileOutPutStream(String name):
+            缓冲字节输出流 BufferedOutputStream(FileOutputStream out):
+
+        字节流可以复制任意文件, 有两种方式(一次一字节, 一次一字节数组)
+        一般采用缓冲字节流, 一次一字节数组
+
+    字符流 -->
+        字符输入流抽象类 Reader:
+            底层字符输入流 InputStreamReader(FileInputStream in , String CharsetName):
+               字符输入流 FileReader(String fileName):
+            缓冲字字符输入流 BufferedReader(FileReader in):
+        字符输出流抽象类 Writer:
+            底层字符输出流 OutputStreamWriter(FileOutputStream out, String CharsetName):
+               字符输入流 FileWriter(String fileName):
+            缓冲字符输出流 BufferedWriter(FileWriter out):
+
+        字符流只能复制文本数据, 有三种种读写方法(一次一字符, 一次一字符数组, 一次一行)
+        一般采用缓冲字符流, 一次一行
+
+IO流:
+    IO流分类:
+        数据流向分类
+            输入流: 读数据
+            输出流: 写数据
+        数据类型分类:
+            字节流:
+                字节输入流, 字节输出流
+            字符流:
+                字符输入流, 字符输出流
+    使用场景:
+        文件记事本打开可以读懂, 使用字符流
+        文件记事本打开读不懂, 使用字节流:
+            不知道使用哪种类型的流, 使用字节流
+
+    复制图片用时比较:
+        (1) 基本字节流一次读写一个字节           965ms
+        (2) 基本字节流一次读写一个字节数组        2ms
+        (3) 字节缓冲流一次读写一个字节           12ms
+        (4) 字节缓冲流一次读写一个字节数组        2ms
+
+字节流:
+    基本说明:
+        包含InputStream和OutputStream
+        InputStream -> 抽象类 所有字节输入流的超类(读)
+        OutputStream -> 抽象类 所有字节输出流的超类(写)
+
+
+FileOutputStream:
+    使用流程:
+        (覆盖写入)
+        FileOutputStream fos = new FileOutputStream("fos.txt");     //覆盖写入构造方法
+
+        byte[] byt = "abcde123 ".getBytes();
+
+        fos.write(97);                                              //write(int b)方法        ASCII -> a
+        fos.write(byt);                                             //write(Byte b)方法
+        fos.write(byt, 1, byt.length - 1);                          //write(Byte b, int off, int len)方法
+
+        fos.close();                                                //close()方法
+
+        (追加写入)
+        FileOutputStream fos = new FileOutputStream("fosAppend.txt", true);  //覆盖写入构造方法
+
+        for (int i = 0; i <= 10; i++) {
+            fos.write("hello".getBytes());      // String.getBytes(), 字符串转换为字节数组, 详见三种write方法
+            fos.write("\n".getBytes());
+        }
+
+        fos.close();
+    基本说明:
+        字节输出流
+        OutputStream的子类
+        用于在硬盘中写文件
+        需要抛出一个文件未发现异常
+        String.getByte()方法可得到String的字节数组, 如"abcde.getByte()"
+
+    构造方法:
+        public FileOutputStream(String name):
+            覆盖写入
+            是FileOutputStream的五种构造方法的其中一种
+            相当与FileOutputStream(File file), 而FileOutputStream(File file)相当与FileOutputStream(new File("***")):
+
+        public FileOutputStream(String name, boolean append):
+            追加写入
+            append为:
+                true -> 末尾追加
+                false -> 覆盖写入
+            是FileOutputStream的五种构造方法的其中一种
+
+
+    FileOutputStream的三种write方法(写数据到文件):
+        void write(int b):
+            每次将单个字节写入此文件输出流
+        void write(byte[] b):
+            每次将字节数组b写入字节输出流, 一次写一个字节数组
+        void write(byte[] b, int off, int len):
+            每次将字节数组下标off开始, 长度为len的数据写入字节输出流
+
+    字节流写数据的步骤:
+        第一步 -> 创建字节输出流对象:   // FileOutputStream fos = new FileOutputStream("D:\\user\\work\\space\\fos.txt");
+            调用系统功能创建了文件
+            创建了字节输出流对象
+            将字节输出流对象指向文件
+        第二步 -> 调用写数据方法:      // fos.write(97) //ASCII码 -> a
+        第三步 —> 释放资源:           // foa.close()
+            关闭文件输出流并释放与此相关联的任何系统资源
+        
+    字节流写数据的小问题:
+        写数据时实现换行
+            windows: \r\n
+            linux:   \n
+            mac:     \r
+
+FileOutputStream异常标准处理:
+    使用流程:
+        FileOutputStream fos = null;            //指针初始化为null, 这样
+        try {                                   //try...catch...finally... 处理FileNotFoundException
+            fos = new FileOutputStream("fos.txt");      //这里有文件未发现异常
+            fos.write("hello".getBytes());                    //这里有IO异常
+        } catch (IOException e){                //这里处理了两个异常, IOException是FileNotFoundException的子类,
+            e.printStackTrace();                //打印异常详情, 但程序绕过try继续向下执行
+        } finally {
+            if (fos != null) {                               //fos指针非空时运行
+                try {
+                    fos.close();
+                    /* 这里有三个异常
+                          (1) 若12行文件未发现, 则new后不执行, fos便为空指针, 通过 if(fos != null)处理
+                          (2) fos文件位发现异常
+                          (3) close()方法的IO异常
+                    */
+                } catch (IOException e) {      //这里处理两个异常
+                    e.printStackTrace();
+                }
+            }
+        }
+    基本说明:
+        jvm在异常处理时提供finally块执行所有清除操作, 如IO流的释放资源
+    FileOutputStream写数据的异常处理:
+        try{
+            ...
+        } catch(异常名 变量名) {
+            异常处理代码;
+        } finally {
+            执行所有清楚操作;
+        }
+
+FileInputStream:
+    使用流程:
+        (单字节读数据)
+        //控制台单字符转码, 无法打印汉字
+        FileInputStream fis = new FileInputStream("fos.txt");
+
+        //单字节循环读取
+        int by;
+        while ((by = fis.read()) != -1){    //read()未读到内容时返回-1   fis.read()下次执行时,自动读取下一个字符
+            System.out.print((char)by);     //控制台单字节转码, 打印不出中文(除非保存为文件)
+        }
+
+        fis.close();
+
+
+        (字节数组读数据)
+        //可在控制台打印汉字
+        FileInputStream fis = new FileInputStream("Libai.txt")
+
+        byte[] bys = new byte[1024];                //注意是1024整数倍
+        int len;
+        while ((len = fis.read(bys)) != -1) {       //read(bys)未读到内容时返回-1 fis.read(byte[] b)方法下一次执行时, 自动读取下一个字符数组
+            System.out.print(new String(bys, 0, len));  // 构造方法 String(byte[] b, int offset, int length)
+        }
+
+        fis.close();
+
+    基本说明:
+        字节流读数据
+        是InputStream的子类
+        作用是从文件中读取数据
+
+    构造方法:
+        public FileInputStream(String name):
+            创建字节流读数据对象
+            是FileInputStream类的三种构造方法的其中一种
+
+    FileInputStream的三种read()方法:
+        int read():
+            每次读取一个字节的数据, 当不存在内容时, 返回-1
+        int read(byte[] b):
+            每次读取一个字节数组的数据,
+            当字节数组:
+                读到内容 -> 返回读到的元素个数
+                没有读到内容 -> 返回-1
+        int read(byte[] b, int off, int len):
+            每次读开始下表为off, 长度len的内容
+    String类的构造方法(将字节数组转化为字符串):
+        String(byte[] b, int offset, int length):
+            字符数组b, 从下标offset开始, 长度为length的部分转为字符串
+
+        String(byte[] b):
+            将字节数组b转换为字符串
+    字节流读数据的步骤:
+        (1) 创建字节输入流对象
+        (2) 调用字节输入流对象的读数据方法
+                read()单字节读数据   (char)by 转换打印
+                read(byte[] b)字节数组读数据 -> String(byte[] b, int offset, int length)转换打印
+        (3) 释放资源
+
+
+字节缓冲流:
+    使用流程:
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream("LiBai.txt"));                                      //字节缓冲输入流构造方法
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("C:\\Users\\admin\\Desktop\\诗仙李白.txt"));       //字符缓冲输出流构造方法
+
+        //字符数组复制
+        byte[] bys = new byte[1024];
+
+        int len;
+        while ((len = bis.read(bys)) != -1){
+            System.out.println(new String(bys, 0, len));                            //构建字符串用来输出
+            bos.write(bys, 0, len);
+        }
+
+        bis.close();
+        bos.close();
+
+    基本说明:
+        字节缓冲流仅仅提供缓冲区, 真正的读写数据还是依靠基本的字节流对象来操作, 因此其参数只能是字节流对象
+        创建一个大的缓存字节数组作为缓存区, 将数据先存到缓冲区, 缓冲区一次性存入硬盘
+
+    构造方法:
+        字节缓冲输入流:
+            public BufferedInputStream(InputStream out):
+                参数是InputStream或其子类, 由于InputStream是抽象类, 所以只能是子类
+                该类实现缓冲输出流, 通过设置这样的输出流, 引用程序可以向底层输入流写入字节, 而不必为写入的每个字节导致底层系统的调用
+        字节缓冲输出流:
+            public BufferedOutPutStream(OutputStream in):
+                参数是InputStream或其子类, 由于InputStream是抽象类, 所以只能是子类
+                创建BufferedOutPutStream将创建一个内部缓存区数组, 当从流总读取或跳过字节时, 内部缓存区将根据需要从所包含的输入流中重新填充, 一次很多字节

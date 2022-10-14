@@ -1,0 +1,10 @@
+
+表1 --> [张三李四转账]:
+    -- 创建数据表
+    CREATE TABLE account (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    NAME VARCHAR(10),
+    balance DOUBLE
+    );
+    -- 添加数据
+    INSERT INTO account (NAME, balance) VALUES ('张三', 1000), ('李四', 1000);

@@ -1,0 +1,340 @@
+函数式接口知识点目录
+    函数式接口概述:
+    函数式接口作为方法的参数:
+    函数式接口作为方法的返回值:
+    常见的函数式接口:
+        Supplier<T>接口:
+        Supplier<T>获取最大值:
+
+        Consumer<T>接口:
+        Consumer<T>接口字符串切片分别判断
+
+        predicate<T>接口:
+        predicate<T>接口字符串切片分别判断:
+
+
+函数式接口概述:
+    使用流程:
+        MyInterface mi = () -> System.out.println("java world");
+        mi.show();
+
+
+        (MyInterface 接口)
+        @FunctionalInterface                    //函数式接口注解
+        public interface MyInterface {
+            void show();
+        }
+
+    基本说明:
+        注解符号 @FunctionalInterface
+        有且只有一个抽象方法的接口
+    函数式接口:
+        有且只有一个抽象方法的接口
+        java中的函数式编程体现就是Lambda表达式,
+            所以函数式接口就是可以适用于Lambda使用的接口
+        只有确保接口中有且只有一个抽象方法, java中的Lambda才能顺利进行推导
+    @FunctionalInterface
+        函数式接口的注释符号
+        若定义的是函数式接口, 建议加上该注解
+        放在接口定义的上方:
+            如果接口是函数式接口, 编译通过
+            如果不是, 编译失败
+    注意:
+        我们自己定义函数式接口的时候, @FunctionalInterface是可以不写的,
+            就算我不写这个注释, 只要接口符合保证函数式接口定义的条件, 就是函数式接口
+
+函数式接口作为方法的参数:
+    使用流程:
+        startThread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(Thread.currentThread().getName() + "多线程启动");
+            }
+        });
+
+        startThread(() -> System.out.println(Thread.currentThread().getName() + "多线程启动"));      //函数式接口作为参数启动多线程
+
+        private static void startThread(Runnable r) {
+            new Thread(r).start();                                                                 //重现的是r内部的东西
+        }
+    基本说明:
+        startThread( () -> System.out.println(...))
+
+函数式接口作为方法的返回值:
+    使用流程:
+        ArrayList<String> array = new ArrayList<>();
+        array.add("aaa");
+        array.add("bb");
+        array.add("dddd");
+        array.add("c");
+
+        System.out.println("排序前" + array);
+        Collections.sort(array, getComparator1());                   //Collections的Sort(List list, Comparator<T> comparator)方法, 根据Comparator(函数式接口)自定义方式排序
+        System.out.println("排序后" + array);
+    }
+    private static Comparator<String> getComparator1() {
+        return (s1, s2) -> s1.length() - s2.length();               //方式一: Lambda实现并返回Comparator<String>
+
+//        Comparator<String> comp = new Comparator<String>() {      //方式二: 创建接口对象实现并返回Comparator<String>
+//            @Override
+//            public int compare(String s1, String s2) {
+//                return s1.length() - s2.length();
+//            }
+//        };
+//        return comp;
+
+//        return new Comparator<String>() {                        //方式三: 内部类实现并返回Comparator<String>
+//            @Override
+//            public int compare(String s1, String s2) {
+//                return s1.length() - s2.length();
+//            }
+//        };
+
+    }
+    基本说明:
+        函数式接口操作方法中, 通过匿名内部类或Lambda重写后返回
+    实例:
+        private static Comparator<String> getComparator() {
+            return (s1, s2) -> s2.length();
+        }
+    Collections工具类的 Sort(List list, Comparator<T> comparator) 方法:
+        可自定义排序方式
+        通过实现Comparator接口并作为参数传入
+
+常用函数式接口:
+
+Supplier<T>接口:
+    使用流程:
+        int str1 = getInteger(new Supplier<Integer>() {                 //匿名内部类调用函数式接口Supplier
+            @Override
+            public Integer get() {
+                return 11223;
+            }
+        });
+        System.out.println(str1);
+
+        int num = getInteger(() -> 10086);                              //Lambda表达式调用Supplier接口获取数据
+        String str = getString( () -> "张辉");
+        System.out.println(num + " " + str);
+
+        private static Integer getInteger(Supplier<Integer> sup){       //Supplier接口操作方法
+            return sup.get();
+        }
+
+        private static String getString(Supplier<String> sup) {         //Supplier接口操作方法
+            return sup.get();
+        }
+    基本说明:
+        唯一的抽象方法是T get()
+        是一个生产数据的接口, 返回的是一个自定义的泛型数据
+    Supplier<T>接口:
+        接口也被称为生产接口, 如果我们指定了接口的泛型是什么类型, 那么接口中的get方法就会生产什么类型的数据
+
+Supplier<T>获取最大值:
+    使用流程:
+        int[] arr = {19, 50, 28, 37, 46};
+
+        int num = getMax( () -> {                                 //Lambda重写接口返回最大值
+           int max = arr[0];
+           for (int i = 1; i < arr.length; i++){
+               if (arr[i] > max) {
+                   max = arr[i];
+               }
+           }
+           return max;
+        });
+
+        System.out.println(num);
+
+        private static Integer getMax(Supplier<Integer> sup) {              //Supplier接口操作方法
+            return sup.get();
+        }
+    基本说明:
+        练习
+
+    代码格式:
+        private static Integer getMax(Supplier<Integer> sup) {
+            return sup.get();
+        }
+
+Consumer<T>接口:
+    使用流程:
+        operatorString("张辉", new Consumer<String>() {                                                             //匿名内部类实现消费性接口Consumer, 重写accept(T t)方法为输出原字符串
+            @Override
+            public void accept(String s) {
+                System.out.println(s);
+            }
+        });
+
+        operatorString("张辉", new Consumer<String>() {                                                             //匿名内部类实现消费性接口Consumer, 重写accept(T t)方法为输出反转后的字符串
+            @Override
+            public void accept(String s) {
+                System.out.println(new StringBuilder(s).reverse().toString() + "\n");
+            }
+        });
+
+
+        operatorString( "天下第一", s -> System.out.println(s));                                                    //Lambda实现消费性接口Consumer, 重写accept(T t)方法为输出原字符串
+
+        operatorString("天下第一", s -> System.out.println(new StringBuilder(s).reverse().toString() + "\n"));      //Lambda实现消费性接口Consumer, 重写accept(T t)方法为输出反转后的字符串
+
+
+
+        operatorString("国士无双", s -> System.out.println(s), s -> System.out.println(new StringBuilder(s).reverse().toString()));         //同一个字符串多次消费;参数输入两个Consumer, 对同一个字符串, 进行不同的操作
+
+
+        private static void operatorString(String name, Consumer<String> con1, Consumer<String> con2) {
+            con1.andThen(con2).accept(name);        //两个Consumer对象, 依次调用各自的accept(T t)方法
+        }
+
+
+        private static void operatorString(String name, Consumer<String> con) {
+            con.accept(name);
+        }
+    基本说明:
+        数据消费接口Consumer<T>
+        唯一的抽象方法是void accept(T t); 默认方法为default Consumer<T> andThen(Consumer after)
+
+    Consumer接口:
+        该接口一共含有两个方法
+            抽象方法: accept(T t)接口
+                对接口的数据进行消费操作
+            默认方法: default Consumer<T> andThen(Consumer after)
+                将两个Consumer对象组合, 依次调用各自的accept(T t)方法
+
+                实例代码:
+                    private static void operatorString(String name, Consumer<String> con1, Consumer<String> con2) {     //两个Consumer接口, 都要重写各自的accept(T t)方法
+                        con1.andThen(con2).accept(name);        //两个Consumer对象, 依次调用各自的accept(T t)方法
+                    }
+
+Consumer<T>接口典型案例:
+    使用流程:
+        String[] strArray = {"林青霞, 30", "张曼玉, 35", "王祖贤, 33"};
+        operatorString(strArray, s -> System.out.print("姓名: " + s.substring(0, 3)), s -> System.out.println(", 年龄: " + s.substring(5)));
+
+        private static void operatorString(String[] strArray, Consumer<String> con1, Consumer<String> con2) {
+            for (String s : strArray ) {
+                con1.andThen(con2).accept(s);
+            }
+        }
+    基本说明:
+        操作类中调用consumer接口的andThen()方法
+
+Predicate<T>接口:
+    使用流程:
+        (Demo1 与2无关)
+        boolean bl1 = checkStringLength("world", s -> s.length() > 8);                  //Lambda重写test判断条件并返回boolean值接口
+        System.out.println(bl1);
+
+        boolean bl2 = checkStringLength("java world", s -> s.length() > 8);
+        System.out.println(bl2);
+
+        private static boolean checkStringLength(String s,Predicate<String> pre){
+            //return pre.test(s);
+            return pre.negate().test(s);                                                //Predicate negate()方法; 将pre对象的接口反转并返回这个对象
+        }
+
+        (Demo2 与1无关)
+            public static void main(String[] args) {
+                boolean result = checkString("java world", s -> s.length() > 8, s -> s.length() < 8);           //两个Lambda都重写test判断条件并返回各自boolean结果
+                System.out.println(result);
+            }
+            private static boolean checkString(String s, Predicate<String> pre1, Predicate<String> pre2){
+                return pre1.and(pre2).test(s);                                                                  //default Predicate<T> and(Predicate other)方法; 对两个pre进行&&运算, 并返回一个pre对象
+                //return pre1.or(pre2).test(s);                                                                 //default Predicate<T> or(Predicate other)方法;  对两个pre进行||运算, 并返回一个pre对象
+
+                //boolean b1 = pre1.test(s);
+                //boolean b2 = pre2.test(s);
+                //return b1 && b2;
+            }
+
+    基本说明:
+        Demo练习test方法和negate()方法
+        Demo2练习and和or方法
+        只使用boolean test(T t), 和 default predicate<T> negate()方法
+    Predicate<T>接口:
+        共有一个抽象, 三个默认方法
+        boolean test(T t):
+            抽象方法
+            对给定的参数进行判断(判断逻辑由Lambda实现), 返回一个Boolean值
+        default Predicate<T> negate():
+            返回一个逻辑的否定, 对应逻辑非    !
+        default Predicate<T> and(Predicate other):
+            返回一个组合判断, 对应短路与     &&
+        default Predicate<T> or(Predicate other)
+            返回一个组合判断, 对应短路或     ||
+
+
+Predicate<T>接口典型案例:
+    使用流程:
+        boolean result = checkString("java world", s -> s.length() > 8, s -> s.length() < 8);               //两个Lambda都重写test判断条件并返回各自boolean结果
+        System.out.println(result);
+
+        private static boolean checkString(String s, Predicate<String> pre1, Predicate<String> pre2){       //default Predicate<T> and(Predicate other); 组合判断
+            return pre1.and(pre2).test(s);
+        }
+
+    基本说明:
+        组合判断 and 和 or 方法
+
+Function<T, R>接口:
+    使用流程:
+        convert("100", s -> Integer.parseInt(s));                                                                   //调用第一个convert
+        convert("100", Integer::parseInt);
+
+        convert(100, i -> String.valueOf(i + 100));                                                                 //调用第二个convert
+
+        convert("100", Integer::parseInt,  i -> String.valueOf(i + 100));                                           //调用第三个convert
+
+
+
+        private static void convert(String s, Function<String, Integer> fun){                                       //定义一个方法, 将字符串转换为int类型, 并在控制台输出
+            System.out.println(fun.apply(s));
+        }
+
+
+        private static void convert(int i, Function<Integer, String> fun) {                                         //定义一个方法, 把一个int类型的数据加上一个整数之后, 转换为字符串输出到控制台
+            System.out.println(fun.apply(i) + "\n");
+        }
+
+
+        private static void convert(String s, Function<String, Integer> fun1, Function<Integer, String> fun2) {     //定义一个方法, 把一个String转换为int类型, 把这个int类型加上一个整数之后, 转换为String类型, 将结果输出到控制台
+            String str = fun1.andThen(fun2).apply(s);
+            System.out.println(str);
+        }
+    基本说明:
+        Function<T, R>接口通常用于对类型为T参数进行转换, 转换逻辑由Lambda实现, 然后返回一个类型为R的值
+        andThen方法可以对同一个参数进行多次转换, 前一次转换的结果作为下一次转换的参数
+            如: fun1.andThen(fun2).apply(s)   先转换fun1, fun1的结果将作为fun2的参数
+
+    Function<T, R>接口:
+        抽象方法只有一个, 为: R apply(T t)
+
+        R apply(T t):
+            将一个类型为T的参数, 转换为类型R并输出
+        default <V> Function andThen(Function after):
+            组合函数, 第一个Lambda转换的结果, 是第二个Lambda的参数, 第二个Lambda输出最终结果
+
+Function<T, R>接口字符串切片转型加值输出
+    使用流程:
+        String[] strArray = {"林青霞, 33", "风清扬, 30", "桔梗, 18"};
+        convert(strArray, s -> Integer.parseInt(s.split(", ")[1]), i -> String.valueOf(i + 70));
+
+        private static void convert(String[] strArray, Function<String, Integer> fun1, Function<Integer, String> fun2) {        //Function接口
+            for (String  s : strArray) {
+                String str = fun1.andThen(fun2).apply(s);                                                                       //  default <V> Function andThen(Function after)方法; R apply(T t)方法
+                System.out.println(str);
+            }
+        }
+    基本说明:
+        要求:
+            将字符串截取得到年龄部分
+            将上一步的年龄字符串转换为int类型的数据
+            将上一步的int数据加70, 得到一个int结果, 并在控制台输出
+
+
+
+
+
+
+

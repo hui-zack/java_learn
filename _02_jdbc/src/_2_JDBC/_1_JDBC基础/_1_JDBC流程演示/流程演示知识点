@@ -1,0 +1,43 @@
+JDBC:
+    基本概念:
+        Java Datebase Connectivity:
+            Java数据库连接
+            java语言操作所有关系型数据库
+    本质:
+        其实是官方(sun公司)定义的一套所有关系型数据库的规则, 即接口:
+            每个数据库厂商去实现这套接口, 该接口实现类称为数据驱动jar包
+            我们使用JDBC编程, 真正执行的代码是驱动jar包中的实现类
+
+    JDBC步骤:
+        1. 导入驱动jar包:
+            复制jar包, 到lib目录下
+            右键lib目录, 添加为库
+        2. 注册驱动
+        3. 获取数据库连接对象 Connection
+        4. 定义sql
+        5. 获取执行sql语句的对象 Statement
+        6. 处理结果
+        7. 释放资源
+
+JDBC流程显示:
+    使用流程:
+        //注册JDBC驱动
+        Class.forName("com.mysql.jdbc.Driver");
+
+        //获取获取数据库操作对象
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/db3", "root", "root");       //连接对象
+        Statement stmt = conn.createStatement();                                                                //操作对象
+
+        //执行sql语句
+        String sql_command = "update account set balance = 300 where id = 1";
+        int result = stmt.executeUpdate(sql_command);
+        System.out.println(result);
+
+        //释放资源
+        conn.close();
+        stmt.close();
+
+    基本说明:
+
+
+

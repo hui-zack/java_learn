@@ -1,0 +1,73 @@
+Collections工具类知识点:
+
+    Collections.sort()方法使用Comparable对list排序:
+    Collections.sort()方法使用Comparator对ArrayList排序
+
+Collections.sort()方法使用Comparable对list排序:
+    使用流程:
+        (Student类)
+            public class package2.Student implements Comparable<package2.Student> {
+                @Override
+                    public int compareTo(package2.Student s) {
+                        int num = this.age - s.age;
+                        num = num == 0 ? this.name.compareTo(s.name) : num;
+                        return num;
+                    }
+                }
+        (demo)
+            ArrayList<package2.Student> array = new ArrayList<>();
+
+            package2.Student s1 = new package2.Student("张辉", 23);
+            package2.Student s2 = new package2.Student("曹飞鱼", 21);
+            package2.Student s3 = new package2.Student("吴楠", 22);
+
+            array.add(s1);
+            array.add(s2);
+            array.add(s3);
+
+            Collections.sort(array);                // sort()方法 Student必须实现Comparable或Comparator接口
+            Collections.reverse(array);             // reverse方法
+            Collections.shuffle(array);             // shuffle方法
+
+Collections.sort()方法使用Comparator对ArrayList排序
+        ArrayList<package2.Student> array = new ArrayList<>();
+
+        package2.Student s1 = new package2.Student("张辉", 23);
+        package2.Student s2 = new package2.Student("曹飞鱼", 21);
+        package2.Student s3 = new package2.Student("吴楠", 22);
+
+        array.add(s1);
+        array.add(s2);
+        array.add(s3);
+
+        Collections.sort(array, new Comparator<package2.Student>() {         //Collections工具类sort实现Comparator排序
+            @Override
+            public int compare(package2.Student s1, package2.Student s2) {
+                int num = s1.getAge() - s2.getAge();
+                num = num == 0 ? s1.getName().compareTo(s2.getName()) : num;
+                return num;
+            }
+        });
+
+        Collections.sort(array);    // sort()方法 Student必须实现Comparable或Comparator接口
+        Collections.reverse(array); // reverse方法
+        Collections.shuffle(array); // shuffle方法
+
+    基本说明:
+        是集合的操作类
+        需要对List或其子类进行排序时, 需要使用Comparable或Comparator
+        直接继承自Object
+    方法概述:
+        public static <T extends Comparable<? super T>>  void sort(List<T> list):
+            功能:
+                将指定的列表按升序排序
+            两点要求:
+                list的参数T,
+                T必须是或继承/实现了Comparable接口,
+                T也可以是继承/实现了Comparable接口的父类
+
+        public static void reverse(List<?> list)
+            反转列表中元素顺序
+        public static void shuffle(List<?> list)
+            使用默认的随机源随机排序列表
+

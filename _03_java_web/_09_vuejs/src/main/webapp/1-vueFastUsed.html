@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+    <div id="app" >
+        <input v-model="username"> {{username}}
+    </div>
+
+    <!-- 0.导入vue.js文件 -->
+    <script src="js/vue.js"></script>
+    <script>
+        //1. 创建vue核心对象
+        new Vue({
+            el: "#app",
+            data(){             // 也可以写为data: function() {
+                return {
+                    //2.绑定数据,model名称
+                    username: ""
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <!-- 第一步, 引入axios-->
+    <script src="js/axios-0.18.0.js"></script>
+
+    <!-- 第二步, 使用axios发送请求 -->
+    <script>
+/*
+        //1. 发送get请求
+        axios ({
+            method: "get",
+            url: "http://localhost/axiosServlet?username=admin"
+        }).then(function (response) {
+            alert(response.data);
+        })
+
+        //2. 发送post请求
+        axios({
+            method: "post",
+            url: "http://localhost/axiosServlet",
+            data: "username=baby"
+        }).then(function (response) {
+            alert(response.data);
+        })
+*/
+        //1. 发送get请求(别名)
+        axios.get("http://localhost/axiosServlet?username=admin").then(function (resp) {
+            alert(resp.data);
+        })
+
+        //2. 发送post请求(别名)
+        axios.post("http://localhost/axiosServlet", "username=baby").then(function (resp) {
+            alert(resp.data)
+        })
+    </script>
+</body>
+</html>

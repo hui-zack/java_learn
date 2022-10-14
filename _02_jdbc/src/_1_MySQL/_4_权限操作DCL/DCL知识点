@@ -1,0 +1,127 @@
+DCL权限操作目录:
+    基础知识:
+
+    --> [增删查用户]
+        查询用户:
+        创建用户:
+        删除用户:
+    --> [用户密码修改]
+        修改密码:
+    --> [DCL权限管理]
+        查询用户权限:
+        授予权限:
+        撤销权限:
+
+知识点总结:
+    --> [增删查用户]
+        查询用户:
+            USE mysql;                                                                      -- 切换到mysql表
+            SELECT * FROM USER;                                                             -- 查询user表
+        创建用户:
+            use mysql;
+            CREATE USER "admin"@"localhost" IDENTIFIED BY "123";                            -- 创建只能本地登录的admin用户, 密码123
+            CREATE USER "hui"@"%" IDENTIFIED BY "123";                                      -- 创建可本地可远程的hui用户, 密码123
+        删除用户:
+            DROP USER "admin"@"localhost";                                                  -- 删除用户, 该用户的登录方式必须写对才能删除
+    --> [用户密码修改]
+        修改密码:
+            (方式一)
+                UPDATE USER SET PASSWORD = PASSWORD("563020221") WHERE USER = "hui";        -- 修改hui用户的密码为: 563020221
+            (方式二)
+                SET PASSWORD FOR "hui"@"%" = PASSWORD("563020221");                         -- 修改hui用户的密码为: 563020221
+
+    --> [DCL权限管理]
+        查询用户权限:
+            SHOW GRANTS FOR "root"@"%";                                                     -- 查询root用户权限
+            SHOW GRANTS FOR "hui"@"%";                                                      -- 查询hui用户权限
+        授予权限:
+            GRANT ALL ON *.* TO "hui"@"%";                                                  -- 授予hui用户所有权限, 相当于root
+            GRANT select delete update  ON db3.account TO "hui"@"%";                        -- 授予hui用户增删改权限, 对于db3库的account表
+        撤销权限:
+            REVOKE DELETE ON *.* FROM "hui"@"%";                                            -- 撤销hui用户的delete权限, 针对所有库下的所有表
+------------------------------------------------------------------------------------------------------------------------
+基础知识:
+    sql分类:
+        DDL: 操作数据库和表
+        DML: 增删改数据
+        DQL: 查数据
+        DCL: 管理用户, 授权
+
+--> [增删查用户]
+
+查询用户:
+    使用流程:
+        USE mysql;                          -- 切换到mysql表
+        SELECT * FROM USER;                 -- 查询user表
+
+    基本说明:
+        用户数据存储在mysql库的user表中
+        查询结果有两条条数据
+            %: 通配符, 表示可以在任意主机使用用户登录数据库
+创建用户:
+    使用流程:
+        use mysql;
+        CREATE USER "admin"@"localhost" IDENTIFIED BY "123";        -- 创建只能本地登录的admin用户, 密码123
+        CREATE USER "hui"@"%" IDENTIFIED BY "123";                  -- 创建可本地可远程的hui用户, 密码123
+
+        select * from user;
+    基本说明:
+        由于主要是在修改mysql库的user表, 所以执行前必须 use mysql;
+    命令详解:
+        CREATE USER "用户名"@"可登录主机名" IDENTIFIED BY "密码";
+            可登录主机名:
+                localhost:
+                    表示该用户只能在主机登录本数据库
+                %:
+                    表示该用户可在任意主机登录本数据库
+
+删除用户:
+    使用流程:
+        DROP USER "admin"@"localhost";                          -- 删除用户, 该用户的登录方式必须写对才能删除
+    基本说明:
+        drop user "用户名"@"登录方式"
+
+--> [用户密码修改]
+
+修改密码:
+    使用流程:
+        (方式一)
+            UPDATE USER SET PASSWORD = PASSWORD("563020221") WHERE USER = "hui";        -- 修改hui用户的密码为: 563020221
+        (方式二)
+            SET PASSWORD FOR "hui"@"%" = PASSWORD("563020221");                         -- 修改hui用户的密码为: 563020221
+    基本说明:
+        修改用户密码的两种方式
+    忘记root密码:
+        1. 管理员权限关闭mysql服务
+            cmd: net stop mysql
+        2. 使用无验证方式启动mysql
+            mysqld --skip-grant-tables
+        3. 在另一cmd中输入mysql连接数据库, 并修改mysql密码
+            use mysql;
+            update user set password = password("root") where user = "root";
+        4. 关闭mysqld进程
+            在任务管理器手动手动关闭该服务
+
+--> [DCL权限管理]
+
+查询用户权限:
+    使用流程:
+        SHOW GRANTS FOR "root"@"%";                                         -- 查询root用户权限
+        SHOW GRANTS FOR "hui"@"%";                                          -- 查询hui用户权限
+    基本说明:
+        查询用户的权限:
+            show grants for "用户名"@"主机名";
+
+
+授予权限:
+    使用流程:
+        GRANT ALL ON *.* TO "hui"@"%";                                  -- 授予hui用户所有权限, 相当于root
+        GRANT select delete update  ON db3.account TO "hui"@"%";        -- 授予hui用户增删改权限, 对于db3库的account表
+    基本说明:
+        grant 权限列表 on 库名.表名 to "用户名"@"主机";
+
+撤销权限:
+    使用流程:
+        REVOKE DELETE ON *.* FROM "hui"@"%";                            -- 撤销hui用户的delete权限, 针对所有库下的所有表
+    基本说明:
+        revoke 权限列表 on 库名.表名 from "用户名"@"主机名";

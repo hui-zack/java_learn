@@ -1,0 +1,273 @@
+response知识点目录:
+    响应消息:
+    response-对象:
+    response-资源重定向:
+    response-输出字符数据到浏览器:
+    response-输出字节数据到浏览器:
+
+
+响应消息:
+	情况说明:
+		* HTTP结构:
+			请求消息: 客户端发送给服务器端的数据
+				1. 请求行
+				2. 请求头
+				3. 请求空行
+				4. 请求体
+			响应消息: 服务器端发送给客户端的数据
+			    1. 响应行
+				2. 响应头
+				3. 响应空行
+				4. 响应体
+		* 响应的字符串格式:(访问localhost/index.jsp)
+			HTTP/1.1 200                                //* 响应行
+            Content-Type: text/html;charset=UTF-8       //* 响应头
+            Content-Length: 101
+            Date: Fri, 14 Jan 2022 09:56:35 GMT
+                                                        //* 响应空行
+            <html>                                      //* 响应体
+              <head>
+                <title>$Title$</title>
+              </head>
+              <body>
+              $hello response$
+              </body>
+            </html>
+        *响应行:
+            实例: HTTP/1.1 200
+
+            1. 响应行格式: 协议/版本 响应状态码 状态码描述
+            2. 响应状态码:
+                服务器高数客户端浏览器本次亲贵和响应的一个状态
+                分类:
+                    1xx
+                        服务器接收客户端消息, 但没有接收完成, 响应1XX状态码
+                    2xx
+                        通常表示成功
+                            200 --> 成功
+                    3xx
+                        通常表示重定向
+                            302 --> 资源重定向
+                                例: 浏览器发送请求, A资源分析后返回B资源路径和302状态码(表示应该请求B资源),
+                                 接收响应消息后浏览器自动请求B资源
+                            304 --> 访问缓存
+                    4xx
+                        通常表示客户端错误
+                            404 --> 请求路径没有对应的资源
+                            405 --> 请求方式没有对应的doXXX方法
+                    5. 5xx
+                        通常表示服务器端错误
+                        500 --> 服务器内部出现异常
+        * 响应头:
+            实例:
+                Content-Type: text/html;charset=UTF-8       //* 响应头
+                Content-Length: 101
+                Date: Fri, 14 Jan 2022 09:56:35 GMT
+            响应头格式:
+                头名称: 值
+            常见的响应头:
+                Content-Type: text/html;charset-utf8
+                    text/html: 告诉浏览器使用为html文本数据
+                    charset-utf8: 告诉浏览器文本编码为utf8
+                Content-disposition:
+                    告诉浏览器打开响应体数据的格式
+                    默认值为: content-disposition: in-line
+                    如:
+                        Content-disposition:in-line             在当前页面打开数据
+                        Content-disposition:filename=xxx        以附件形式打开响应体, 如文件下载
+
+       * 响应体:
+            真实的响应数据
+
+response-对象:
+    情况说明:
+        * 响应实例:
+        			HTTP/1.1 200                                //* 响应行
+                    Content-Type: text/html;charset=UTF-8       //* 响应头
+                    Content-Length: 101
+                    Date: Fri, 14 Jan 2022 09:56:35 GMT
+                                                                //* 响应空行
+                    <html>                                      //* 响应体
+                      <head>
+                        <title>$Title$</title>
+                      </head>
+                      <body>
+                      $hello response$
+                      </body>
+                    </html>
+    内容:
+        * response-响应行方法:
+            1. 设置状态码:
+                setStatus(int sc)
+        * response-响应头方法
+            1. 设置响应头
+                setHeader(String name, String values)
+        * response-响应体对象
+            1. 设置响应体:
+                part1 获取输出流
+                    1 字符输出流:
+                        PrintWriter getOutputStream()
+                    2 字节输出流
+                        ServletOutputStream getOutPutStream()
+                part2 使用输出流, 将数据输出到客户端浏览器:
+
+response-资源重定向:
+    使用流程:
+        --> [part1 A资源 servlet资源]
+            /*
+            * 案例-重定向
+            *   重定向的特点:
+            *       1. 重定向地址栏发生变换
+            *       2. 重定向可以访问其他站点(服务)的资源
+            *       3. 重定向是两次请求
+            *   重定向至百度: resp.sendRedirect("http://baidu.com")
+            * */
+            @WebServlet("/responseRedirectA")
+            public class responseRedirectA_demo extends HttpServlet {
+                @Override
+                protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    System.out.println("...A资源被访问...");
+            /*
+                    //1. 设置状态码: 重定向-302                             //* 复杂方式实现重定向(原理)
+                    resp.setStatus(302);
+                    //2. 设置响应头: B资源路径
+                    resp.setHeader("location", "/responseRedirectB");
+            */
+                //1. 通过重定向方法实现资源重定向
+                    resp.sendRedirect("http://baidu.com");
+                    //resp.sendRedirect("/responseRedirectB");
+
+                }
+
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    doPost(req, resp);
+                }
+            }
+        --> [part2 B资源 servlet资源]
+            @WebServlet("/responseRedirectB")
+            public class responseRedirectB_demo extends HttpServlet {
+                @Override
+                protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    System.out.println("...B资源被访问...");
+                }
+
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    doPost(req, resp);
+                }
+            }
+    情况说明:
+        * 重定向(访问A资源时):
+            资源跳转的一种方式
+            状态码-302
+            告诉浏览器B资源路径
+            由于重定向是两次请求, 因此不能通过request域来共享数据
+        * 重定向和转发的区别
+            转发的特点:
+                1. 转发地址栏路径不变
+                2. 转发只能访问当前服务器下的资源
+                3. 转发是一次请求
+            重定向的特点:
+                1. 重定向地址栏发生变换
+                2. 重定向可以访问其他站点(服务)的资源
+                3. 重定向是两次请求
+        * servlet路径:
+            相对路径:
+                如: ./index.html
+                规则: 要使用相对路径, 要明确当前资源和目标资源之间的相对路径关系
+            绝对路径:
+                如:
+                    http://localhost/responseRedirectA
+                    /responseRedirectB                      // 是的, 这个也是绝对路径
+        * 判断路径中是否要加虚拟目录:
+            给客户端使用的路径, 需要加虚拟目录
+            给服务器使用的路径, 不需要加虚拟目录
+
+
+    内容:
+        * 实现重定向的两种方式
+            方式1 分别设置状态码和响应头实现重定向:
+                步骤1 设置状态码为302
+                    resp.setStatus(302);
+                步骤2 设置响应头为重定向
+                    resp.setHeader("location", "/responseRedirectB")
+            方式2 通过重定向方法实现重定向
+                resp.sendRedirect("/responseRedirectB")
+
+response-输出字符数据到浏览器:
+    使用流程:
+        --> [输出字符text数据到浏览器]
+            /*
+            * 通过response-body, 输出字符text数据到浏览器
+            * */
+            @WebServlet("/characterText")
+            public class characterTextDemo extends HttpServlet {
+                @Override
+                protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    // Content-Type: text/html;charset=UTF-8
+                    //1. 设置响应头返回数据编码格式
+                    resp.setContentType("text/html;charset=utf8");              //简单方法设置响应头返回编码信息
+                            /*
+                                resp.setHeader("Content-Type", "text/html;charset=utf8");   // 复杂方法设置响应头返回编码信息
+                            */
+                    //2. 获取字节输出流
+                    PrintWriter pw = resp.getWriter();
+                    //3. 输出数据到网页
+                    pw.write("<h1>你好 response</h1>");
+                    pw.println("<h1>你好 response</h1>");
+
+                }
+
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    doPost(req, resp);
+                }
+            }
+
+    内容:
+        * response输出字符text数据到浏览器步骤:
+            步骤1. 指定响应头返回数据编码方式 Content-Type: text/html;charset=UTF-8
+                方式1: resp.setHeader("Content-Type", "text/html;charset=utf8");
+                方式2: resp.setContentType("text/html;charset=utf8")
+            步骤2. 获取字符输出流
+                PrintWriter pw = resp.getWriter();
+            步骤3. 使用输出方法输出到网页
+                方式1: resp.println(<h1>"你好, response"</h1>);
+                方式2: resp.write(<h1>"你好, response"</h1>);
+
+response-输出字节数据到浏览器
+    使用流程:
+        --> [字节流输出text数据到浏览器]
+            /*
+            * 使用字节输出流, 输出字节text数据到浏览器
+            * */
+            @WebServlet("/bytesText")
+            public class bytesTextDemo extends HttpServlet {
+                @Override
+                protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    //1. 设置响应头返回数据解码方式
+                    resp.setContentType("text/html;charset=utf8");
+                    //2. 获取字节输出流
+                    ServletOutputStream os = resp.getOutputStream();
+                    //3. 输出text数据到浏览器
+                    os.write("<h3>你好 response</h3>".getBytes("utf-8"));
+                }
+
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    doPost(req,resp);
+                }
+            }
+    情况说明:
+        * 字节流通常用于输出图片或视频
+    内容:
+        * response输出字节text数据到浏览器步骤:
+            步骤1. 指定响应头返回数据编码方法 Content-Type: text/html;charset=UTF-8
+                resp.setContentType("text/html;charset=utf8")
+            步骤2. 获取字节输出流:
+                ServletOutputStream os = resp.getOutputStream();
+            步骤3. 输出text数据到浏览器
+                os.write("<h3>你好 response</h3>".getBytes("utf-8"));
+
+自动生成验证码案例: _3_case_checkCodeServlet

@@ -1,0 +1,289 @@
+DQL知识点目录:
+    DQL基础查询 -->
+        基础查询:
+        基础查询的标准格式:
+        基础查询-去重:
+        基础查询-列的四则运算:
+        基础查询-起别名:
+    DQL条件查询 -->
+        条件查询-基本:
+        条件查询-模糊查询:
+    _________ -->
+        排序查询:
+        分组查询:
+        分页查询:
+
+知识点整理:
+    --> [基础查询]
+        SELECT name, age FROM student3;                                                         # 查询student3表, name和age列中的条数据
+        SELECT * FROM student3;                                                                 # 查询student3表, 所有列中的条数据
+
+        SELECT DISTINCT address, name, age FROM student;                                        # DISTINCT address 根据该列去重; 去重列只能放在最前面, 否则报错
+
+        SELECT math, english, english + math FROM student3;                                     # english + math; 输出条数据english和math列的和
+
+        SELECT math, IFNULL(english, 0), IFNULL(english, 0) + math AS 总分 FROM student3;        # IFNULL(english, 0) 把english列中的null值 替代为0
+
+        SELECT  math, english, english + math FROM student3;                                    # english + math; 输出条数据english和math列的和
+        SELECT math, IFNULL(english, 0), IFNULL(english, 0) + math AS 总分 FROM student3;        # IFNULL(english, 0) 把english列中的null值 替代为0
+
+        SELECT math AS 数学, english 英语, IFNULL(english, 0) + math AS 总分 FROM student3;        # 起别名
+
+    --> [条件查询]
+        条件查询-基本:
+            SELECT NAME, address, age FROM student3 WHERE age = 20;                              -- 20岁的人的姓名. 地址和年龄
+
+            SELECT NAME, age, address FROM student3 WHERE age BETWEEN 20 AND 30;                 -- 年龄大于等于20, 小于等于30
+            SELECT NAME, age, address FROM student3 WHERE age >= 20 AND age <= 30;
+
+            SELECT NAME, age, address FROM student3 WHERE age = 18 OR age = 20 OR age = 25;      -- 年龄为18, 20, 25的人的信息
+            SELECT NAME, age, address FROM student3 WHERE age in (18, 20, 25);
+
+            SELECT * FROM student3 WHERE english IS NULL;                                        -- 英语成绩为null
+            SELECT * FROM student3 WHERE english IS NOT NULL;                                    -- 英语成绩不为null
+
+        条件查询-模糊查询:
+            SELECT * FROM student3 WHERE NAME LIKE "_化%";                                       -- 查询姓名第二个字是化的人
+
+
+    --> [排序查询]
+        SELECT * FROM student3 ORDER BY age ASC;                                                 # 根据年龄升序
+
+        SELECT * FROM student3 ORDER BY age DESC, IFNULL(english, 0) ASC;                        # 根据年龄降序,  若年龄相同, 根据英语成绩升序
+
+
+    --> [分组查询]
+        SELECT sex, AVG(math), COUNT(id) FROM student3 GROUP BY sex;                                            # 按照性别分组, 分别查询男女同学的数学平均分, 人数
+
+        SELECT sex, AVG(math), COUNT(id) FROM student3 WHERE math > 70 GROUP BY sex;                            # 按照性别分组, 分别查询男女同学的数学平均分, 人数; 要求分数<70分的人不参与分组
+
+        SELECT sex, AVG(math), COUNT(id) FROM student3 WHERE math > 70 GROUP BY sex HAVING COUNT(id) > 2;       # 按照性别分组, 分别查询男女同学的数学平均分, 人数; 要求分数<70分的人不参与分组, 分组后大于两个人
+
+    --> [分页查询]
+        SELECT * FROM student3 LIMIT 0, 3;                                                       # 第一页, 每页3条 条数据
+
+        SELECT * FROM student3 LIMIT 3, 3;                                                       # 第二页, 每页3条 条数据
+
+        SELECT * FROM student3 LIMIT 6, 3;                                                       # 第三页, 每页3条 条数据
+
+
+DQL结构:
+    select
+        列1,
+        列2,
+        ...
+    where                   --> 条件查询
+    group by                --> 分组查询
+        having              --> 分组后条件    
+    order by                --> 排序
+    limit                   --> 分页查询
+
+--> DQL基础查询
+基础查询:
+    使用流程:
+        SELECT name, age FROM student3;                 # 查询student3表, name和age列中的条数据
+        SELECT * FROM student3;                         # 查询student3表, 所有列中的条数据
+    基本说明:
+        基础查询结构:
+
+    命令详解:
+        SELECT 列1, 列2 FROM 表名;
+            查询指定表, 列1和列2中的条数据;
+        SELECT * FROM 表名
+            查询指定表, 所有列中的条数据;
+
+基础查询的标准格式:
+    使用流程:
+        SELECT
+            DISTINCT address    -- 去重列; 根据该列去重
+            name,               -- name列
+            age                 -- age列
+        from
+            student3;       -- student3表
+    基本说明:
+        对于复杂的查询语句, 可有效增加阅读性
+
+基础查询-去重:
+    使用流程:
+        SELECT DISTINCT address, name, age FROM student;        # DISTINCT address 去重列, 根据该列去重
+    基本说明:
+        去重列必须在首位
+    命令详解:
+        distinct:
+            根据该列的去重结果来 显示条数据
+            修饰列名
+            ** 去重列 必须在首位, 否则报错 ** 争取写法如下:
+                SELECT DISTINCT address, name, age FROM student3;
+                    根据address列的去重结果显示 address, name, age列
+
+基础查询-列的四则运算:
+    使用流程:
+        SELECT  math, english, english + math FROM student3;                                    # english + math; 输出条数据english和math列的和
+        SELECT math, IFNULL(english, 0), IFNULL(english, 0) + math AS 总分 FROM student3;        # IFNULL(english, 0) 把english列中的null值 替代为0
+    基本说明:
+        只有数值形的数据, 才能进行列的四则运算
+        如何条数据的列值为null, 和该条数据的任意列值相加都为null, 此时考虑null值的替代处理
+    命令详解:
+        SELECT 列名1+列名2 from 表名;
+            列值四则运算
+            对于指定表中的所有条数据, 进行同一条数据的两列相加, 并输出
+            列值必须为数值型
+        SElECT IFNULL(列名, 0) FROM 表名;
+            null替代处理
+            对于指定表中的所有条数据, 列中如果出现null值, 全部替换为0
+
+基础查询-起别名:
+    使用流程:
+        SELECT math AS 数学, english 英语, IFNULL(english, 0) + math AS 总分 FROM student3;   # 起别名
+    基本说明:
+        起别名的关键字为as, 且可以省略
+    命令详解:
+        SELECT 列名1 as 别名1 FROM 表名;
+            对于指定表的指定列, 起别名
+
+--> [条件查询]
+条件查询-基本:
+    使用流程:
+
+        SELECT NAME, address, age FROM student3 WHERE age = 20;                              -- 20岁的人的姓名. 地址和年龄
+
+        SELECT NAME, age, address FROM student3 WHERE age BETWEEN 20 AND 30;                 -- 年龄大于等于20, 小于等于30
+        SELECT NAME, age, address FROM student3 WHERE age >= 20 AND age <= 30;
+
+        SELECT NAME, age, address FROM student3 WHERE age = 18 OR age = 20 OR age = 25;      -- 年龄为18, 20, 25的人的信息
+        SELECT NAME, age, address FROM student3 WHERE age in (18, 20, 25);
+
+        SELECT * FROM student3 WHERE english IS NULL;                                        -- 英语成绩为null
+        SELECT * FROM student3 WHERE english IS NOT NULL;                                    -- 英语成绩不为null
+
+
+    基本说明:
+        根据条件筛选条数据
+    命令详解:
+        > ,   >= ,   < ,   <= ,
+        between ... and ...
+        in (..., ...)
+        and ,   or ,    not
+        in null ,   is not null
+
+条件查询-模糊查询:
+    使用流程:
+
+        SELECT * FROM student3 WHERE NAME LIKE "马%";                -- 查询姓马的人
+
+        SELECT * FROM student3 WHERE NAME LIKE "_化%";               -- 查询姓名第二个字是化的人
+
+        SELECT * FROM student3 WHERE NAME LIKE "___";                -- 查询姓名是三个字的人
+
+        SELECT * FROM student3 WHERE NAME LIKE "%马%"                -- 查询姓名中包含马的人
+    基本说明:
+        占位符:
+            _ : 占单个字符
+            % : 占任意字符
+    命令详解:
+
+        SELECT * FROM 表名 WHERE 列名 LIKE "马%";
+            对于指定表, 以指定的列进行模糊查询
+            占位符:
+                _ : 占单个字符
+                % : 占任意字符
+
+排序查询:
+    使用流程:
+        SELECT * FROM student3 ORDER BY age ASC;                                # 根据年龄升序
+
+        SELECT * FROM student3 ORDER BY age DESC, IFNULL(english, 0) ASC;       # 根据年龄降序,  若年龄相同, 根据英语成绩升序
+    基本说明:
+        多个排序条件, 当前面的条件值一样是, 才会判断第二条件
+    命令详解:
+        SELECT * FROM 表名 ORDER BY 列名 ASC/DESC;                                # 根据年龄升序
+            对于指定表, 根据指定的列升序/降序排列
+
+聚合函数:
+    使用流程:
+        SELECT COUNT(NAME) AS 人数 FROM student3 ;                -- 聚合函数count(列名/*) 求条数据个数; 求总人数
+
+        SELECT AVG(math) FROM student3;                          -- 聚合函数AVG(列名) 求平局值; 计算数学成绩平均值;
+
+        SELECT MIN(IFNULL(english, 0)) FROM student3;            -- 聚合函数MIN(列名) 求最小值; 计算英语成绩最大值
+    基本说明:
+        聚合函数:
+            将所有条数据的相同列进行相应的计算 - 纵向计算
+        所有集合函数在计算时, 都会排除null值:
+            选择非空列 -- 含主键的列
+            使用ifnull(列明, 替代值)函数替换null
+        * :
+            如果条数据中 含有至少一个不为null的列值, 就算一条条数据
+    命令详解:
+        count:
+            所有条数据相同列 计算条数据个数
+        max:
+            所有条数据相同列 计算最大值
+        min:
+            所有条数据相同列 计算最小值
+        sum:
+            所有条数据相同列 计算和
+        avg:
+            所有条数据相同列 计算平均值
+    注意:
+        所有集合函数在计算时, 都会排除null值:
+            选择非空列 -- 含主键的列
+            使用ifnull(列明, 替代值)函数替换null
+        * :
+            如果条数据中 含有至少一个不为null的列值, 就算一条条数据
+
+分组查询:
+    使用流程:
+        SELECT sex, AVG(math), COUNT(id) FROM student3 GROUP BY sex;                                            # 按照性别分组, 分别查询男女同学的数学平均分, 人数
+
+        SELECT sex, AVG(math), COUNT(id) FROM student3 WHERE math > 70 GROUP BY sex;                            # 按照性别分组, 分别查询男女同学的数学平均分, 人数; 要求分数<70分的人不参与分组
+
+        SELECT sex, AVG(math), COUNT(id) FROM student3 WHERE math > 70 GROUP BY sex HAVING COUNT(id) > 2;       # 按照性别分组, 分别查询男女同学的数学平均分, 人数; 要求分数<70分的人不参与分组, 分组后大于两个人
+
+    基本说明:
+        分组后的查询字段只能是 分组字段/聚合函数, 其他的属于无意义显示
+        分组后:
+            条数据被划分到对应的组中, 构成一张张隐藏的分组表, 各个分组表中条数据的条数之和 == 原表条数据的总条数
+            所有分组表都在各自的表中执行having条件判断
+
+    命令详解:
+        SELECT 分组依据列名, 聚合函数 FROM 表名 WHERE 分组前条件 GROUP BY 分组依据列名 having 分组后所有分组列共同执行的条件;
+            查询字段只能是 分组依据列的列名 or 聚合函数
+            where
+                分组前条件
+                分组前根据条件截取表
+            having
+                分组后条件
+                每个分组表都执行该条件
+
+
+    执行流程:
+        先where截取表 --> 分组生成分组表 --> 分组表全部执行having --> 按照分组 以查询字段的格式 输出结果
+        分组表:
+            条数据被划分到对应的分组中, 构成一张张隐藏的分组表
+            条数据按照分组依据列的列值 分配进各个分组表
+            各个分组表中条数据的条数之和 == 原表条数据的总条数
+
+    where和having的区别:
+        where在分组前进行限定:
+            不满足条件的条数据(条数据在原表) 不参与分组
+            不能使用聚合函数
+        having在分组后进行限定:
+            不满足条件的条数据(条数据在分组表) 不输出到select
+            可以使用聚合函数
+分页查询:
+    使用流程:
+        SELECT * FROM student3 LIMIT 0, 3;              # 第一页, 每页3条 条数据
+        SELECT * FROM student3 LIMIT 3, 3;              # 第二页, 每页3条 条数据
+        SELECT * FROM student3 LIMIT 6, 3;              # 第三页, 每页3条 条数据
+    基本说明:
+        limit 条数据的开始索引值, 条数据的条数/每页显示的条数;
+        条数据的开始索引值 = (当前的页码 - 1) * 每页显示的条数
+        limit是一个mysql方言
+    命令详解:
+        select * from 表名 limit 条数据的开始索引值, 条数据的条数/每页显示的条数;
+            对于指定表, 从指定的条数据索引值开始, 往后查询指定的条数
+            第一条条数据的索引值为0
+
+
+

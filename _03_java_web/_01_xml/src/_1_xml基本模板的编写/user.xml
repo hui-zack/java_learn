@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<users>
+    <user id='1'>
+        <name>犬夜叉</name>
+        <age>23</age>
+        <gender>male</gender>
+    </user>
+    <user id='2'>
+        <name>扎马斯</name>
+        <age>24</age>
+        <gender>male</gender>
+    </user>
+    <user id='3'>
+        <name>路明非</name>
+        <age>23</age>
+        <gender>male</gender>
+    </user>
+    <data>
+
+    </data>
+    <!--CDATA区: 原样展示内容<![CDATA[]]>-->
+    <![CDATA[a>b? && a<b?]]>
+</users>

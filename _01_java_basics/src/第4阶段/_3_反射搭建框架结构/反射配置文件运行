@@ -1,0 +1,38 @@
+反射配置文件运行:
+    使用流程:
+        //读取文件为map集合
+        Properties prop = new Properties();
+        FileReader fr = new FileReader("java_basics\\data\\set.txt");
+        prop.load(fr);
+        fr.close();
+
+            /*  类加载器调用方法生成指定文件的字节流
+                    ClassLoader classLoader = ReflectDemo.class.getClassLoader();               //调用类加载器, 将
+                    InputStream is = classLoader.getResourceAsStream("set.properties");         //类加载器加载指定文件为InputStream流 set.properties文件中不能写中文因此不能用
+                    prop.load(is);
+                    System.out.println(prop);
+            */
+
+        //获取配置内容
+        String className = prop.getProperty("className");
+        String method = prop.getProperty("method");
+
+
+        Class<?> cls = Class.forName(className);
+
+        Constructor<?> con = cls.getDeclaredConstructor();
+        con.setAccessible(true);
+        Object obj = con.newInstance();
+
+        Method me = cls.getDeclaredMethod(method);
+        me.setAccessible(true);
+        me.invoke(obj);
+    基本说明:
+        类加载器
+        类加载器的get
+    类加载器:
+        本类名.class.getClassLoader():
+            返回 类加载器,返回类型ClassLoader
+    类加载器的getResourceAsStream()方法:
+        InputStream getResourceAsStream(String fileName):
+            返回 指定文件的字节输入流

@@ -1,0 +1,23 @@
+java_web学习路线:
+    数据库Mysql             --> 数据存储技术
+    前端课程                --> 页面展示技术
+    web核心课程             --> 服务器端编程技术
+    项目                   --> 黑马旅游网
+
+    vue                   --> https://www.bilibili.com/video/av76249419?spm_id_from=333.788.b_636f6d6d656e74.120
+
+后期学习路线:
+    SSM框架: 简化web开发的经典框架
+    SpringBoot: 简化Spring开发的框架
+    SpringCloud: 微服务开发解决方案
+
+    中间件技术:
+        Redis:
+        MongoDB:
+        RabbitMQ:
+        ElasticSearch:
+
+    容器技术:
+        Docker
+
+    业务解决方案:

@@ -1,0 +1,109 @@
+异常:
+    错误和异常:
+        error:
+            错误: jvm无能为力的问题, java中通常由硬件引起
+            严重问题, 不需要处理
+        Exception:
+            处理方法:
+                异常类, 它表示程序本身可以处理的问题
+            runtime异常 和 非runtime异常
+                runtime异常:
+                    运行时出错
+                    编译时不检查, 出问题后需要我们修改代码
+                普通异常:
+                    编译时出错
+                    编译时就必须处理的异常, 否则程序不能通过编译
+    异常体系:
+                  Throwable
+        Error                   Exception
+                    RuntimeException   非RuntimeException
+
+    java处理机的默认处理方案:
+        把异常的名称, 异常原因和异常出现的位置等信息输出到控制台
+        程序停止执行
+
+    异常处理:
+        基本说明:
+            为了让程序继续执行, 需要自己做异常处理
+        处理方案:
+
+try catch:
+    使用流程:
+
+    代码格式:
+        try {
+            可能出现异常的代码;
+        } catch(异常类 异常对象名) {
+            异常的处理代码;    //如: 异常对象名.printStackTrace();
+        }
+    执行流程:
+        程序从try开始执行(try中出现异常不继续往下执行)
+        出现异常, 会自动生成一个异常类对象, 并提交到java的运行时系统
+        java运行时系统接受到异常对象时, 回到catch中寻找异常类, 接到后进行异常处理
+        执行完毕后, 程序继续往下执行
+
+throws:
+    使用流程:
+        public static void method() throws ParseException{  //抛出异常
+            ...;
+        }
+    基本说明:
+        有些异常try...catch...无权处理, 需要用到throws
+        常用于编译时异常
+    用法:
+        将异常抛出, 先不解决, 等到使用时再解决(用try...catch...)
+
+
+自定义异常:
+
+
+
+Throwable的成员方法:
+    使用流程:
+        try {
+            可能出异常的代码;
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            System.out.println(ex.getMessage());    //getMessage()方法
+            System.out.println(ex.toString());      //toString()方法
+            ex.printStackTrace();                   //printStackTrace()方法
+        }
+    基本说明:
+        throwable是所以错误和异常的超类, 因此都能使用它的成员方法
+    常用成员方法:
+        public String getMessage()
+            返回throwable的详细字符串
+        public String toString()
+            返回可抛出的简短描述
+        public void printStackTrace()
+            将异常的信息输出到控制台
+
+编译时异常 和 运行时异常:
+    基本说明:
+        Java中的异常分为两大类, 编译时异常和运行时异常, 也被称为 受检异常 和 非受检异常
+        Runtime异常为运行时异常, 其他的异常都是编译时异常
+
+自定义异常:
+    使用流程(三步):
+        (定义异常类ScoreException)
+        public class ScoreException extends Exception{      //
+            public ScoreException() {}
+            public ScoreException(String message){
+                super(message);     ////一直传递到父父类的构造方法, 在那里有几个方法能把其输出(如: getMessage()等)
+            }
+        }
+
+        (Demo)
+        //定义方法 抛出这个异常
+        public void checkScore(int Score) throws ScoreException {
+            if (score<0 || score>100) {
+                throw new ScoreException("分数不在0-100中间");    //抛出异常
+            } else {
+                System.out.println("分数正常");
+            }
+        }
+
+        //main调用方法
+        int score = -1;
+        check(score);
+
+

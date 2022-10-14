@@ -1,0 +1,236 @@
+IO流小结:
+    字节流:
+        字节输入流抽象类 InputStream:
+            底层字节输入流 FileInputStream(String name):
+            缓冲字节输入流 BufferedInputStream(FileInputStream in):
+        字节输出流抽象类 OutputStream:
+            底层字节输出流 FileOutPutStream(String name):
+            缓冲字节输出流 BufferedOutputStream(FileOutputStream out):
+            字节打印流 PrintStream(String filename):
+        字节流可以复制任意文件, 有两种方式(一次一字节, 一次一字节数组)
+        一般采用缓冲字节流, 一次一字节数组
+
+    字符流:
+        字符输入流抽象类 Reader:
+            底层字符输入流 InputStreamReader(FileInputStream in , String CharsetName):
+                简便字符输入流 FileReader(String fileName):
+            缓冲字字符输入流 BufferedReader(FileReader in):
+
+        字符输出流抽象类 Writer:
+            底层字符输出流 OutputStreamWriter(FileOutputStream out, String CharsetName):
+               简便字符输入流 FileWriter(String fileName):
+            缓冲字符输出流 BufferedWriter(FileWriter out):
+            字符打印流 PrintWriter(String FileName) or PrintWriter(writer out, boolean autoFlush)
+        字符流只能复制文本数据, 有三种种读写方法(一次一字符, 一次一字符数组, 一次一行)
+        一般采用缓冲字符流, 一次一行
+
+
+
+
+字符流:
+    基本说明:
+        字节流操作中文不是很方便, 所以java提供了字符流
+        字符流 = 字节流 + 编码表
+        汉字在存储的时候, 无论使用那种编码标准, 第一个字节都是负数
+
+
+
+编码表:
+    基础知识:
+        计算机存储的信息都是用二进制表示: 我们再屏幕上看到的英文, 汉字等字符是二进制转换之后的结果
+        编码: 将字符储存到计算机中
+        解码: 将存储的二进制数据按某种规则解析出来
+        A编码存储, 必须按A编码解析, 才能显示正确的信息, 否则会出现乱码
+    字符集:
+        系统支持的所有字符的集合, 包含各国文字, 标点符号, 图形符号, 数字等
+        计算机要准确识别各种制度及符号, 就要进行字符编码, 一套字符集至少有一套字符编码
+        常见的字符集有ASCII字符集, GBK字符集, Unicode字符集等
+    编码表:
+        ASCII字符集的编码表:
+            ASCII码:美国通用的一套字符存储和编码标准, 用来显示现代英语, 数字, 及各种标点符号等
+            每7位表示一个字符, 一共128个字符.
+            ASCII的扩展字符集每8位表示一个字符, 共256个字符, 以方便支持欧洲字符
+        GBK字符集的编码表:
+            GBK是最常用的中文码表, 实在GB2312标注基础上的扩展规范, 使用了双字节编码方法, 收录了21003个汉字, 哇暖捷荣GB2312标准. 同时知识繁体汉字和日韩汉字等
+            简体中文码表
+            GB2312: 简体中文码表. 一个小于127的字符意义与原来相同, 包含有全角符号, 但大于127的字符连接在一起, 就表示一个汉字, 全角符号等
+            此外还包括数学顾好, 罗马希腊的字母, 日文等的假名等
+            GB18030: 最新的中文码表， 收录70244个汉字， 多字节编码， 每个字可能由1个， 2个， 或4个字节组成， 支持中国少数民族的文字， 同时支持简繁汉字， 日韩汉字等
+        Unicode字符集的编码表:
+            统一码, 标准万国码
+            最多使用4个字节来表示字母, 符号, 或文字
+            有三种编码方案UTF-8, UTF-16, UTF32, 最常用的是UTF-8编码
+            UTF-8:
+                可用来表示Unicode中的任意字符, 它是电子邮件, 网页和其他存储或传送文字的应用中, 优先采用的编码
+
+String中的编码和解码:
+    使用流程:
+        String s = "中国";
+
+        //编码
+        byte[] bys = s.getBytes("GBK");
+        System.out.println(Arrays.toString(bys));
+
+        //解码
+        System.out.println(new String(bys, "GBK"));
+        
+    编码:
+        基本说明:
+            使用String中的成员方法编码, 将字符串转换为二进制数存储
+
+        方法概述:       //String中的成员方法
+            byte[] getBytes():
+                使用平台默认的字符集编码表将String编码为字节, 存储到返回的字节数组中
+            byte[] getBytes(String charsetName):
+                使用指定的字符集和编码表将String编码为字节, 存储到返回的字节数组中
+    解码:
+        基本说明:
+            似乎用String中的构造方法解码, 将字符串转换为二进制数存储
+        方法概述:       //String中的构造方法
+            String(byte[] bytes):
+                使用平台默认的字符集和编码表, 解码指定的字节数组来构建新的String
+            String(byte[] bytes):
+                使用指定的字符集和编码表, 将字节数组解码为新的String
+
+InputStreamReader和OutputStreamWriter:
+    使用流程:
+        InputStreamReader isr = new InputStreamReader(new FileInputStream("data\\LiBai.txt"), "GBK");                           //编码
+        OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("C:\\Users\\admin\\Desktop\\LiBai.txt"), "GBK");   //解码
+
+        char[] chs = new char[1024];
+        int len;
+        while ((len = isr.read(chs)) != -1) {
+            osw.write(chs, 0, len);
+            System.out.println(new String(chs, 0, len));
+        }
+
+        isr.close();
+        osw.close();
+    基本说明:
+        字符流写数据必须使用flush()方法将数据从缓存区写到硬盘
+        close()方法 -> 关闭前自动刷新一次
+    内容:
+        InputStreamReader和OutputStreamWriter:
+            InputStreamReader:
+                字节流 --> 指定字符流
+                读取字节, 使用指定的编码将其解码为字符
+                它使用的字符集可以由名称定义, 也可以被明确定义, 或者可以接受平台的默认字符集
+            OutputStreamWriter:
+                指定字符流 --> 字符流
+                读取字节, 使用指定的编码将写入的字符转换为字节
+                它使用的字符集可以由名称定义, 也可以被明确定义, 或者可以接受平台的默认字符集
+
+        构造方法:
+            OutputStreamWrite(OutputStream out):
+                创建按一个使用平台默认字符集的OutputStream
+            OutputStreamWrite(OutputStream out, String CharsetName):
+                创建一个使用指定字符集的OutputStream
+            InputStreamReader(InputStream in):
+                创建按一个使用平台默认字符集的InputStream
+            InputStreamReader(InputStream in, Stream CharsetName):
+                创建按一个使用指定字符集的InputStream
+
+        OutputStreamWrite的五种write方法:
+            void write(int c):
+                写一个字符
+            void write(char[] chs):
+                写一个字符数组
+            void write(char[] chs, int off, int len):
+                写一个字符数组的一部分
+            void write(String str):
+                写一个字符串
+            void write(String str, int off, int len):
+                写一个字符串的一部分
+
+        InputStreamReader的两种read()方法:
+            int read():
+                一次读一个字符
+            int read(char[] chs):
+                一次读一个字符数组
+                返回值是字符数组的长度
+
+FileReader和FileWriter:
+    使用流程:
+        FileReader fr = new FileReader("D:\\user\\learn\\java\\java_basics\\src\\第2阶段\\IO流\\字节流\\OutputStream底层字节流\\字节流写数据异常标准处理\\tryCatchFinallyDemo.java");
+        FileWriter fw = new FileWriter("data\\LiBai.txt");
+
+        char[] chs = new char[1024];
+        int len;
+        while ((len = fr.read(chs)) != -1) {
+            fw.write(chs, 0, len);
+
+    基本说明:
+        基本上算是InputStreamReader和OutputStreamWriter的简化写法
+        无法指定编码格式
+        FileReader(String filename):
+            是InputStreamReader的子类
+            构造方法更加简洁, 使用方法完全一致
+            只能使用本地默认编码, 无法指定编码格式
+        FileWriter(String filename):
+            是OutputStreamWriter的子类
+            构造方法更加简洁, 使用方法完全一致
+            只能使用本地默认编码, 无法指定编码格式
+    构造方法:
+        public FileReader(String filename)
+            继承自InputStreamReader
+        public FileWriter(String filename)
+            继承自OutputStreamWriter
+
+字符缓存流:
+    使用流程:
+        BufferedReader br = new BufferedReader(new FileReader("data\\LiBai.txt"));
+        BufferedWriter bw = new BufferedWriter(new FileWriter("LiBai.txt"));
+
+        char[] chs = new char[1024];
+        int len;
+        while ((len = br.read(chs)) != -1){
+            bw.write(chs, 0, len);
+            System.out.println(new String(chs, 0, len));
+        }
+
+        br.close();
+        bw.close();
+
+    BufferedWriter和BufferedReader:
+        BufferedWriter:
+            通过FileWriter将数据写入字符输出流
+            先写入缓冲区大小, 再写入硬盘
+            缓存区大小一般使用默认大小就可以, 也可以指定大小
+        BufferedReader:
+            通过FileReader将数据读到字符输入流
+             先读到缓冲区
+             缓存区大小一般使用默认大小就可以, 也可以指定大小
+    构造方法:
+        BufferedWriter(Writer out):
+            参数一般传入FileWriter, 是Writer的子类
+        BufferedReader(Reader in)
+            参数一般传入FileReader, 是Reader的子类
+
+字符流的标准使用:
+    使用流程:
+        //写数据
+        BufferedWriter bw = new BufferedWriter(new FileWriter("data\\bw.txt"));     //缓冲字符输出流对象
+        for (int i = 0; i < 10; i++) {
+            bw.write("hello java" + i);
+            bw.newLine();                                                           //newLine()方法, 添加换行符
+            bw.flush();
+        }
+        bw.close();
+
+        //读数据
+        BufferedReader br = new BufferedReader(new FileReader("data\\bw.txt"));     //缓冲字符输入流对象
+
+        String line;
+        while ((line = br.readLine()) != null) {                                    //readLine()方法 一次读一行
+            System.out.println(line);
+        }
+
+字符缓冲流的特有功能:
+    BufferedWriter的特有功能:
+        void newLine():
+        相当于换行符, 根据操作系统自动添加系统
+    BufferedReader的特有功能:
+        public String readLine():
+            一次读一行数据, 但不包含换行符等终止字符
+            若到达流的结尾, 返回null
+

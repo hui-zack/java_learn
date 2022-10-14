@@ -1,0 +1,97 @@
+数据输入:
+    import java.util.Scanner;   //导包
+        Scanner sc = new Scanner(System.in);  //创建对象
+        int i = sc.nextInt();   //接受数据
+流程控制:
+    顺序结构:
+        按照语句的先后顺序执行
+    分支结构:
+        if结构:
+            格式1:
+                if(关系表达式) {
+                    语句体;
+                }
+            格式2:
+                if(关系表达式){
+                    语句体;
+                } else {
+                    语句体;
+                }
+            格式3:
+                if(关系表达式) {
+                    语句体;
+                } else if {
+                    语句体;
+                } else {
+                    语句体;
+                }
+        switch格式:
+            基本语法格式:
+                switch(表达式) {
+                    case 值1:
+                        语句体;
+                        break;
+                    case 值2:
+                        语句体;
+                        break;
+                    ...
+                    default:
+                        语句体;
+                }
+            case穿透:
+                switch(表达式) {
+                    case 值1:
+                    case 值2:
+                        语句体;
+                        break;
+                    case 值3:
+                    case 值4:
+                    case 值5:
+                        语句体;
+                        break;
+                    default:
+                        语句体;
+                }
+
+    循环结构:
+        三种循环
+            for:
+                语法:
+                    for(初始化语句; 判断语句; 控制语句) {
+                        语句体;
+                    }
+                执行顺序:
+                    初始化语句 -> 判断语句 -> 语句体 ->控制语句
+            while:
+                语法:
+                    初始化语句;
+                    while (判断语句) {
+                        循环语句;
+                        控制语句;
+                    }
+            do...while:
+                初始化语句;
+                do {
+                    循环语句;
+                } while(条件判断语句);
+        死循环:
+            for(;;) {
+                语句体;
+            }
+            ------------
+            while(true) {
+                语句体;
+            }
+            ------------
+            do {
+                语句体;
+            } while(true);
+        三种循环的区别:
+            for和while先判断后执行, do...while先执行后判断
+            do...while至少会执行一次
+            for的初始化语句在内部,是局部变量
+    跳转控制:
+        continue 和 break
+
+
+

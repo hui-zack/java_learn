@@ -1,0 +1,265 @@
+servlet流程:
+	servlet简单流程(体验下即可):
+	Servlet原理:
+	servlet生命周期:
+	IDEA和Tomcat的相关配置:
+	GenericServlet和httpServlet:
+
+servlet简单流程:
+	使用流程:
+		--> [servlet的部署及接口的实现]
+			1. 创建javaEE项目
+			2. 定义一个类, 实现Servlet接口, 实现接口中的抽象方法
+				package _1_servlet快速流程;
+
+                import javax.servlet.*;
+                import java.io.IOException;
+
+                public class servletDemo1 implements Servlet {
+                    @Override
+                    public void init(ServletConfig servletConfig) throws ServletException {
+
+                    }
+
+                    @Override
+                    public ServletConfig getServletConfig() {
+                        return null;
+                    }
+
+                    /**
+                     *  servlet提供服务的方法
+                     * */
+                    @Override
+                    public void service(ServletRequest servletRequest, ServletResponse servletResponse) throws ServletException, IOException {
+                        System.out.println("hello Servlet");
+                    }
+
+                    @Override
+                    public String getServletInfo() {
+                        return null;
+                    }
+
+                    @Override
+                    public void destroy() {
+
+                    }
+                }
+
+			3. 在项目or模块的 web/WEB-INF/web.xml文件中配置如下内容:
+			    <!-- 配置Servlet -->
+                <servlet>
+                    <servlet-name>demo1</servlet-name>                                          <!-- servlet名称 随便起 -->
+                    <servlet-class>_1_servlet快速流程.servletDemo1</servlet-class>               <!-- 这里写从java类代码, src开始的包及全类名 -->
+                </servlet>
+
+                <servlet-mapping>
+                    <servlet-name>demo1</servlet-name>
+                    <url-pattern>/servletDemo1</url-pattern>                                    <!-- 资源路径; 其对应的项目名为 http://localhost:8080/项目虚拟名称/servletDemo1 -->
+                </servlet-mapping>
+
+			4. 启动tomcat
+				访问: http://localhost:8080/_2_ServletProject_war_exploded/servletDemo1
+					idea/8:Services/server/output出现了Servlet接口中实现的service方法内的逻辑
+	情况说明:
+		* servlet:
+			Servlet是一个接口, 定义了Java类被tomcat识别的规则
+			我们自己定义一个类, 实现servlet的接口, 重启方法
+
+
+Servlet原理:
+	url调用service方法的原理:
+
+        http://localhost:8080/servletDemo1  -->[根据url中的servletDemo1去web.xml中找全类名]
+            <url-pattern>/servletDemo1</url-pattern>   ->  <servlet-class>_1_servlet快速流程.servletDemo1</servlet-class>  -->[web.xml]
+                Class.forName("_1_servlet快速流程.servletDemo1")   --> [加载进内存]
+                    创建对象: cls.newInstance()
+                        调用方法: service
+
+
+servlet生命周期:
+	情况说明:
+		* servlet的生命周期
+		    0. 何时创建servlet对象:
+		         @WebServlet():
+                    urlPatterns="/helloServlet" : 决定servlet的访问路径
+                    loadOnStartup = num :
+                        num为负数 : servlet第一次被访问时被创建
+                        num为0或整数: 服务器启动时创建servlet对象, 数字越小优先级越高
+
+			1. 被创建
+				--  执行init方法, 只执行一次
+					1.1 默认情况下, 第一次被访问时, servlet被创建
+					1.2 可以自行指定servlet的创建时机, 详见  内容/* 自行指定servlet的创建时机
+			2. 提供服务
+				--  执行service方法, 执行多次
+					每次访问Servlet时, Service都会被调用一次
+			3. 被销毁
+				--  执行destroy方法, 执行一次
+					Servlet被销毁前执行, 服务区关闭时, Servlet被销毁
+					只有服务器正常关闭时, 才会执行destroy方法
+					destroy方法在Servlet被销毁前执行, 一般用于释放资源
+
+        * 多个用户访问servlet, 可能数据安全问题:
+            线程安全问题解决方法:
+                尽量不要在servlet中定义成员变量, 即使定义了成员变量, 也不要赋值
+
+    内容:
+        * servlet的五个方法:
+            init()                  : 初始化方法 在servlet被创建时执行, 只会执行一次
+			getServletConfig()      : 获取ServletConfig对象, Servlet的配置对象(需要自己实现)
+            service(...)            : servlet提供服务的方法, 每一次被访问时都会执行
+			getServletInfo()        : 获取Servlet的一些信息, 如版本, 作者等 (需要自己实现)
+			destroy()               : 销毁方法, 在服务器正常关闭时执行, 执行一次
+
+		* 自行指定servlet的创建时机:
+			说明:
+				默认情况下, servlet在第一次访问时被创建
+
+			修改web.xml设定servlet的创建时机(创建时执行init()执行):
+				<servlet>
+					<!-- 默认-1: 在第一次访问时执行init(), 0或正整数: 在服务器启动时执行init() -->
+					<load-on-startup>-1</load-on-startup>
+				</servlet>
+
+servlet注解配置:
+	使用流程:
+		--> [使用注解来配置资源路径]
+
+			@WebServlet(urlPatterns = "/servletAnnConfig")                  //* 注解配置; 也可以写成: @WebServlet("/servletAnnConfig")
+	        public class Servlet__AnnConfigDemo implements Servlet {
+	            @Override
+	            public void init(ServletConfig servletConfig) throws ServletException {
+
+	            }
+
+	            @Override
+	            public ServletConfig getServletConfig() {
+	                return null;
+	            }
+
+	            @Override
+	            public void service(ServletRequest servletRequest, ServletResponse servletResponse) throws ServletException, IOException {
+	                System.out.println("servlet3.0来了");
+	            }
+
+	            @Override
+	            public String getServletInfo() {
+	                return null;
+	            }
+
+	            @Override
+	            public void destroy() {
+
+	            }
+	        }
+	情况说明:
+		* Servlet3.0支持注解配置, 可以不用web.xml来配置了(javaEE 6, javaEE 7, javaEE 8)支持
+	   	内容:
+		* 创建注解配置Servlet的步骤:
+			1. 创建javaEE项目, 选择Servlet的版本3.0以上, 可以不创建web.xml
+			2. 定义一个类, 实现Servlet接口, 并重写方法
+			3. 在类上使用@webServlet注解, 进行配置
+				@WebServlet(urlPatterns = "/servletAnnConfig")
+					//* 注解配置; 也可以写成: @WebServlet("/servletAnnConfig"); 这里配置的和web.xml一样, 为资源路径(不是虚拟目录)
+
+IDEA和Tomcat的相关配置:
+	1. IDEA会为每一个tomcat部署的项目单独建立配置文件, 可以在下面查看
+		tomcat运行终端: CATALINA_BASE所值目录
+	2. IDEA tomcat项目的编译
+		自动编译
+		tomcat真正访问的是编译后的项目, (一般会自动编译到项目根目录下的out目录中)
+	3. WEB-INF目录下的资源不能被浏览器直接访问,
+
+GenericServlet和httpServlet:
+	使用流程:
+		--> [httpServlet使用 和html的结合]
+		    (_4_GenericServlet_HttpServlet\servlet__structureDemo.java)
+				@WebServlet("/httpServletDemo0")
+		        public class httpServletDemo1 extends HttpServlet {
+		            @Override
+		            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		                System.out.println("http GET run");
+		            }
+
+		            @Override
+		            protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		                System.out.println("http POST run");
+		            }
+		        }
+	        (web\login.html)
+                <!--
+                    /httpServletDemo0为servlet名, 该类项目路径为: _4_GenericServlet_HttpServlet\servlet__structureDemo.java
+                -->
+                <form action="/httpServletDemo0" method="post">
+                    <input name="username">
+                    <input type="submit" value="提交">
+                </form>
+
+	情况说明:
+		* Servlet接口的实现类
+			GenericServlet  --  抽象类(abstract)
+				将Servlet接口中的方法做了默认空实现, 只将service()方法作为抽象 --> 继承该抽象类, 只需要重写service方法即可
+				一般不用
+			httpServlet     --  抽象类(abstract)
+
+		* service方法内部怎么写?
+			String method = req.getMethod();
+			if ("GET".equals(method)){
+				get获取数据;
+			} else if ("POST".equals(method)){
+				post获取数据;
+			}
+				//* sun公司将代码这个流程代码封装为doGet()和doPost()
+
+		* 为什么会有httpServlet?
+			对http协议的封装, 简化操作
+			重写doGet() / doPost()
+
+servlet相关配置总结:
+	使用路程:
+		--> [demo1 一个资源配置多个资源路径]
+	        @WebServlet({"/servletConfig1", "/servletConfig2", "/servletConfig43"})                //* 三个路径都能访问到本资源
+	        public class ServletConfigDemo1 extends HttpServlet {
+	            @Override
+	            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	                System.out.println("资源访问: servletConfig1(2/3), path: _5_servletConfig__Conclusion\\ServletConfigDemo1.java");
+	            }
+	        }
+
+        --> [demo2 多重路径和任意路径通配符]
+            @WebServlet({"/5/demo2", "/test/*"})                           //* 资源路径写成多层路径
+            public class ServletConfigDemo2 extends HttpServlet {
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    System.out.println("http get run; path: _5_servletConfig__Conclusion\\ServletConfigDemo2.java");
+                }
+            }
+
+	使用流程:
+		--> [注解配置多个访问路径]
+			@WebServlet({"/servletConfig1", "/servletConfig2", "/servletConfig43"})                //* 三个路径都能访问到本资源
+            public class ServletConfig extends HttpServlet {
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    System.out.println("资源访问: servletConfig1(2/3)");
+                }
+            }
+    内容:
+		* 1. urlpartten:Servlet访问路径
+			一个Servlet可以定义多个路径:
+				@WebServlet({"/servletConfig1", "/servletConfig2", "/servletConfig43"})       //* 三个路径都能访问到本资源
+		* 2. @WebServlet() - url配置
+			(1) /xxx
+			(2) /xxx/xxx
+				如: @WebServlet("/5/demo2")
+					访问url: http://localhost/5/demo2
+			(3) /xxx/*
+				如: @WebServlet("/test/.*")
+					访问url: http://localhost/test/任意
+				说明:
+					注解配置中的*访问优先级很低, 只有在url无法访问到其他内容的时候才会访问它
+			(4) *.set
+				如:
+					http://localhost/任意.set
+				说明:
+					不能写为/*.do

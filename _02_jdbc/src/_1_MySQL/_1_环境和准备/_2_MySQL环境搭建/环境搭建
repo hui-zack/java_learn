@@ -1,0 +1,27 @@
+安装:
+    参考文档<MySQL基础.pdf>
+卸载:
+    1. 去MySQL的安装目录找到my.ini文件
+        复制: C:/ProgramData/_1_MySQL/_1_MySQL Server 5.5/Data/
+    2. 卸载MySQL
+    3. 删除C:/ProgramData目录下的MySQL文件夹  //不卸载无法安装MySQL
+
+配置:
+    cmd打开/关闭MySQL服务:
+        开启:
+            net start mysql
+            net stop mysql
+    cmd登录mysql:
+        1. mysql -u用户名 -p密码:
+            常用于连接本地mysql
+        2. mysql -hIP地址 -u用户名 -p密码
+            远程连接mysql
+        3. mysql --host=IP地址 --user=root --password=密码
+            运城连接mysql
+    mysql的目录结构:
+        MySQL安装目录:
+            my.ini: 核心配置文件
+        MySQL数据目录:
+            数据库: 文件夹
+            表:    文件
+            数据:  内容

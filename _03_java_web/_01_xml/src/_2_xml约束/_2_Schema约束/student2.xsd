@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<stu2:schema xmlns="http://www.itcast.cn/xml"
+            xmlns:stu2="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="s2" elementFormDefault="qualified">
+    <stu2:element name="students" type="studentsType"/>
+    <stu2:complexType name="studentsType">
+        <stu2:sequence>
+            <stu2:element name="student" type="studentType" minOccurs="0" maxOccurs="unbounded"/>
+        </stu2:sequence>
+    </stu2:complexType>
+    <stu2:complexType name="studentType">
+        <stu2:sequence>
+            <stu2:element name="name" type="stu2:string"/>
+            <stu2:element name="age" type="ageType" />
+            <stu2:element name="sex" type="sexType" />
+        </stu2:sequence>
+        <stu2:attribute name="number" type="numberType" use="required"/>
+    </stu2:complexType>
+    <stu2:simpleType name="sexType">
+        <stu2:restriction base="stu2:string">
+            <stu2:enumeration value="male"/>
+            <stu2:enumeration value="female"/>
+        </stu2:restriction>
+    </stu2:simpleType>
+    <stu2:simpleType name="ageType">
+        <stu2:restriction base="stu2:integer">
+            <stu2:minInclusive value="0"/>
+            <stu2:maxInclusive value="256"/>
+        </stu2:restriction>
+    </stu2:simpleType>
+    <stu2:simpleType name="numberType">
+        <stu2:restriction base="stu2:string">
+            <stu2:pattern value="heima_\d{4}"/>
+        </stu2:restriction>
+    </stu2:simpleType>
+</stu2:schema>

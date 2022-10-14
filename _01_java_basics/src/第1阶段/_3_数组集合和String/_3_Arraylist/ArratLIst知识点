@@ -1,0 +1,59 @@
+集合基础:
+    集合类:
+        提供一种存储空间可变的存储模型, 存储的数据容量可以改变
+        ArrayList是集合的一种
+ArrayList<E>:
+    概念:
+        是一种可调整的数组
+        <E>是一种特殊的数据类型: 泛型
+    使用方法:
+        ArrayList<String>, ArrayList<package2.Student>
+            //使用 引用数据类型替换E
+    构造方法:
+        创建对象:   //两种方式
+            ArrayList<String> array = new ArrayList<>();
+            ArrayList<String> array = new ArrayList<String>();
+        方法详情:
+            public ArrayList()  //创建一个空的集合
+    添加方法:
+        .add(E e)
+            功能:
+                将指定的元素添加到末尾
+            方法详情:
+                public boolean add(E e)
+        .add(int index, E element)
+            功能:
+                在指定位置插入元素
+            方法详情:
+                public void add(int index, E element)
+    常用方法:
+        .remove(Object o)
+            功能:
+                删除指定的元素, 返回删除是否成功
+            方法详情:
+                public boolean remove(Object o)
+        .remove(int index)
+            功能:
+                删除索引处的元素, 返回被删元素
+            方法详情:
+                public E remove(int index)
+        .set(int index, E element)
+            功能:
+                修改索引处的元素, 返回被改元素
+            方法详情:
+                public E set(int index, E element)
+        .get(int index)
+            功能:
+                返回索引处的元素
+            方法详情:
+                public E get(int index)
+        .size()
+            功能:
+                返回集合的长度
+            方法详情:
+                publice int size()
+集合遍历格式:
+    for (int i=0; i<array.size(); i++) {
+        String s = array.get(i);
+        System.out.println(s.getName() + s.getAge());
+    }

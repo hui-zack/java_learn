@@ -1,0 +1,55 @@
+知识点目录:
+    servletContext对象:
+
+
+servletContext对象:
+    情况说明:
+        * servletContext:
+            概念: 代表整个web应用, 可以和程序的容器(如tomcat服务器)通信
+            功能:
+                1. 获取MIME类型(一种文件类型)
+                2. 是一种域对象, 可以共享数据
+                3. 获取文件的真实路径
+        * MIME类型:
+            说明:
+                MIME类型是在互联网通信过程中, 将每一种文件类型转换为 大类型/小类型格式
+                记录对应关系的文件为tomcat根目录的Conf/web.xml
+                    2068     <mime-mapping>
+                    2069         <extension>jpg</extension>
+                    2070         <mime-type>image/jpeg</mime-type>
+                    2071     </mime-mapping>
+            格式: 大类型/小类型
+                如: text/html    文本类型/html文本
+                    image/jpeg    图片类型/jpe g图片
+        * servletContext域:
+            域范围: 和所有用户的请求共享
+            销毁机制: 从创建共享数据开始, 一直到服务器关闭, 才会自动释放
+            注意: 谨慎使用其数据共享功能, 因为其在内存中一直不放, 很占用资源
+        * tomcat文件运行路径
+            指的是编译后的文件路径, 也称文件运行路径
+            常用于读取配置文件
+            这种办法实在计算路径, 也就是说结果路径不一定正确, 正确的路径在idea中是蓝色的
+        * 配置文件在tomcat一般有三个存放路径:
+            1. 直接存放在src目录下
+            2. 存放在web目录下
+            3. 存放在WEB-INFO目录下
+    内容:
+        1. 获取servletContext对象
+            1) 通过request对象获取servlet对象:
+                request.getServletContext();
+            2) 通过HttpServlet获取
+                this.getServletContext();
+        2. 成员方法:
+            1) 获取MIME类型
+                String context.getMimeType(String filename);
+            2) 服务器内资源共享
+                1> serAttribute(String name, Object value)
+                    说明: 先servletContext域内共享数据
+                    参数: 设置数据名称, 传入要共享的数据对象
+                2> getAttribute(String name)
+                    根据设置好的数据名称, 获取servletContext域内的共享数据
+                3> removeAttribute(String name)
+                    删除在servletContext域内共享的数据
+            3. 计算文件运行路径(服务器)的路径:
+                String getRealPath(String path);
+                    一般用于获取配置文件运行路径

@@ -1,0 +1,569 @@
+进程和线程知识点目录:
+    进程和线程概念:
+    继承Tread类实现多线程-->
+        继承Thread实现多线程
+        获取和修改线程名:
+        获取和修改线程优先级:
+        线程控制三方法:
+    Runnable接口实现多线程-->
+        Runnable接口实现多线程:
+            接口实现类实现多线程;
+            接口操作类实现多线程:
+    锁住同步代码解决多线程数据安全-->
+        卖票案例出现线程不安全的两种情况:
+        同步代码块解决线程数据安全:
+        同步代码块封装为同步方法:
+        线程安全的类:
+        Lock锁_ReentrantLock实现类:
+    生产者消费者案例-->
+        生产者消费者:
+
+进程和线程概念:
+    进程:
+        一个进程是一个正在运行的程序
+        进程是系统进行资源分配和调回的独立单位
+        每一个进程都有它自己的内存空间和系统资源
+    线程:
+        是进程中的单个顺序控制流, 是一条执行路径
+        单线程:
+            一个进程如果只有一条执行路径, 则称为单线程程序
+        多线程:
+            一个程序如果有多条执行路径, 则称为多线程程序
+
+继承Thread实现多线程:
+    使用流程:
+        (MyThread类)                                         //该类继承了Thread实现了多线程
+        public class MyThread extends Thread {          //继承Thread
+            @Override
+            public void run() {                         //重写run()方法
+                for (int i = 0; i<100; i++) {
+                    System.out.println(i);
+                }
+            }
+        }
+
+        (demo类)
+        MyThread my1 = new MyThread();
+        MyThread my2 = new MyThread();
+
+        my1.start();                    //start()方法 开启了一个线程, jvm调用run()方法;
+        my2.start();                    //创建一个新对象(继承了Thread的类) + 这个新对象调用start()方法 == 开启一个线程
+
+
+    基本说明:
+        创建一个新对象(继承了Thread的类) + 这个新对象调用start()方法 == 开启一个线程
+
+    流程:
+       定义一个类MyThread继承Thread
+       在MyThread类中重写run()方法
+       创建MyThread类的对象
+       启动线程
+
+    Thread类的成员方法:
+        run()方法:
+            封装线程执行的代码
+            直接调用run方法, 相当于调用普通方法
+        start()方法:
+            启动线程, 然后由jvm调用线程的run()方法
+        stop()方法:
+            关闭该线程
+
+获取和修改线程名:
+    使用流程:
+        (Demo)
+        MyThread my1 = new MyThread();
+        my1.setName("线程1");                                     //调用超类Thread的setName(String name)设置线程名
+
+        MyThread my2 = new MyThread("线程2");                     //通过构造方法 调用 超类的Thread(String name)构造方法设置线程名
+
+        System.out.println(my1.getName());                       //调用超类Thread的setName()方法获取线程名
+        System.out.println(my2.getName());
+        System.out.println(Thread.currentThread().getName());    //调用Thread的静态currentThread()获取main的引用, 进而调用getName()获取线程名
+
+        (MyThread类)
+        public class MyThread extends Thread {
+            public MyThread() {
+            }
+            public MyThread(String name) {                      //实现可设置线程名称构造方法
+                super(name);
+            }
+
+            @Override
+            public void run() {                                 //run方法()线程执行的内容
+                for (int i = 0; i<100; i++) {
+                    System.out.println(getName() + ": " + i);
+                }
+            }
+
+            public void setTreadName(String TreadName) {       //实现自定义获取线程的方法
+                super.setName(TreadName);
+            }
+        }
+
+    基本说明:
+        设置线程名的方法有两种:
+            调用Tread的setName()设置线程名称
+            通过Tread的构造方法Tread(String name) 设置线程名称
+        获取线程名的方法有一种:
+            调用Tread的getName()方法获取线程名称
+        获取main方法线程的名称有一种:
+            调用Tread的current方法(), 返回对当前正在执行的线程对象的应用
+
+获取和修改线程优先级:
+    使用流程:
+        (Demo)
+        ThreadPriority tp = new ThreadPriority();
+
+        tp.setName("汽车");
+
+        System.out.println(tp1.getPriority());                      //int getPriority() 方法, 获取此线程的优先级
+        tp.setPriority(1);                                          //void setPriority(int newPriority) 方法 更改线程的优先级
+        tp.start();
+
+        (ThreadPriority类)
+        public class ThreadPriority extends Thread {
+            @Override
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    System.out.println(getName() + ": " +i);
+                }
+            }
+        }
+
+    基本说明:
+        线程对CPU有两种调度机制, 分时调度和抢占式调度
+        Thread类中提供getPriority(), 获取此线程的优先级
+        Thread类中提供SetPriority(), 更改此线程的优先级
+
+    线程的两种调度模型:
+        分时调度模型:
+            所有线程轮流使用CPU的使用权, 平均分配每个线程占用CPU的时间片
+        抢占式调用模型:
+            优先让优先级高的线程使用CPU, 如果线程的优先级相同, 那么会随机选择一个
+            优先级高的线程获取的CPU时间片相对多一点
+            线程优先级高仅仅表示获取CPU时间片的几率高, 需要在次数多, 或多次运行才能看出
+            java使用的是抢占式调度模型
+    CPU时间片:
+        假如计算机只有一个CPU, 那么CPu在某一个时间只能执行一条指令, 线程只有得到CPU时间片, 也就是使用权, 才能执行指令
+        因此多线程程序的执行是随机性的, 因为谁能签到CPU的使用权是不一样的
+
+    Thread类获取线程优先级方法:
+        public final int getPriority():
+            返回此线程的优先级
+
+    Thread类更改线程优先级方法:
+        public final void setPriority(int newPriority):
+            更改此线程的优先级
+            线程默认的优先级是5
+            线程优先级的范围是: 1-10
+
+线程控制三方法:
+    使用流程:
+        -->[sleep(long mills)方法]                                             //指定毫秒占时间片
+            (Demo)
+            TheThread tt1 = new TheThread("曹操");
+            TheThread tt2 = new TheThread("刘备");
+            TheThread tt3 = new TheThread("孙权");
+
+            tt1.start();
+            tt2.start();
+            tt3.start();
+
+            (TheThread类)
+            public class TheThread extends Thread{
+                @Override
+                public void run() {                                     //线程执行内容
+                    for (int i = 0; i < 100; i++) {
+                        System.out.println(super.getName() + ": " + i);
+                        try {
+                            this.sleep(50);                             //void sleep(long mills)方法, 指定毫秒内不抢占时间片
+                        } catch (InterruptedException e) {              //处理InterruptedException
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                public TheThread(String name) {
+                    super(name);
+                }
+            }
+
+
+        -->[void join()方法]                                  //全占时间片
+            joinThread jt1 = new joinThread("康熙");
+            joinThread jt2 = new joinThread("四阿哥");
+            joinThread jt3 = new joinThread("八阿哥");
+
+            jt1.start();
+            try {
+                jt1.join();                             //void join()方法
+            } catch (InterruptedException e) {          //处理InterruptedException
+                e.printStackTrace();
+            }
+            jt2.start();
+            jt3.start();
+
+        -->[void setDaemon(boolean on)]                                  //守护进程
+            setDaemonTread sdt1 = new setDaemonTread("关羽");
+            setDaemonTread sdt2 = new setDaemonTread("张飞");
+
+            Thread.currentThread().setName("刘备");                  //设置主进程名为: 刘备
+
+            sdt1.setDaemon(true);                                   //setDaemon(boolean on)方法 将关羽和张飞设置为守护进程
+            sdt2.setDaemon(true);
+
+            sdt1.start();
+            sdt2.start();
+
+
+            for (int i = 0; i < 10; i++){
+                System.out.println(Thread.currentThread().getName() + ": " + i);
+            }
+
+    基本说明:
+        经常使用的线程控制方法有三个, 都是Thread类中的成员方法
+            sleep(long mills);
+            join();
+            setDaemon(boolean on);
+        sleep(long mills) 和 join()方法都要进行异常处理, 解决InterruptedException异常
+    线程控制常用的三个方法:
+        static void sleep(long mills):
+            让此线程在指定毫秒内不占用CPU时间片
+        void join():
+            一旦该线程开始执行, 就必须等待此线程全执行完毕(死亡)
+            占据全部CPU时间片
+        void setDaemon(boolean on):
+            设置为守护线程, 当主线程执行完毕后, 程序停止执行
+            main里执行的程序, 主进程为main
+
+Runnable接口实现多线程:
+    使用流程:
+        -->[接口实现类实现多线程]
+            (Demo)
+            MyRunnable my = new MyRunnable();
+
+            Thread t1 = new Thread(my, "康熙");
+            Thread t2 = new Thread(my, "四阿哥");
+            Thread t3 = new Thread(my, "八阿哥");
+
+            t1.start();
+            t2.start();
+            t3.start();
+
+            (MyRunnable类)
+            public class MyRunnable implements Runnable{
+                public MyRunnable() {
+                }
+
+
+                @Override
+                public void run() {
+                    for (int i = 0; i < 100; i++){
+                        System.out.println(Thread.currentThread().getName() + ": " +i);
+                    }
+                }
+            }
+
+        -->[Runnable接口操作类实现多线程]
+            (Demo)
+            UseRunnable my = new UseRunnable();                     //创建接口操作类对象
+
+            Runnable my1 = my.useRunnable(new Runnable() {          //调用接口的使用方法, 重写run(); 返回Runnable对象
+                @Override
+                public void run() {
+                    for (int i = 0; i < 100; i++) {
+                        System.out.println(i);
+                    }
+                }
+            });
+
+            Thread t1 = new Thread(my1, "曹操");                     //使用Runnable对象构造多线程
+            t1.start();
+
+            (UesRunnable类)
+            public class UseRunnable {
+                public Runnable useRunnable(Runnable target) {          //返回值为Runnable; 构成 Runnable target = new Runnable();
+                    target.run();
+                    return target;                                      //返回Runnable对象
+                }
+            }
+    基本说明:
+        Thread类中有通过Runnable接口的构造Runnable对象的构造方法
+            Thread(Runnable target):
+            Thread(Runnable target, String name):
+        通过接口实现/操作类调用Runnable接口, 获得Runnable对象后, 将其传入Thread构造方法实现多线程;
+    Runnable接口创建Thread对象:
+        使用方法:
+            需要通过接口操作/实现类 重写run方法:
+                接口实现类可通过创建Runnable的继子类对象, 然后传入Tread的构造方法获得Tread对象实现多线程
+                接口操作类可通过返回Runnable对象, 将其传入Tread的构造方法获得Tread对象实现多线程
+        构造方法:
+            Thread(Runnable target):
+            Thread(Runnable target, String name):
+    使用Runnable接口实现多线程的好处:
+        避免了java单继承的局限性;
+        适合多个相同的run代码去处理同一资源的情况, 把线程和程序的代码, 数据有效分离, 体现了面向对象的思想
+
+卖票案例出现线程不安全的两种情况:
+    思考流程:
+        (Demo)
+        SellTicket st = new SellTicket(100);
+
+        Thread t1 = new Thread(st, "窗口1");
+        Thread t2 = new Thread(st, "窗口2");
+        Thread t3 = new Thread(st, "窗口3");
+
+        t1.start();
+        t2.start();
+        t3.start();
+
+        (SellTicket类)
+        public class SellTicket implements Runnable{
+            private int Ticket = 100;
+
+            @Override
+            public void run() {                             //run方法
+                while (true) {
+                    if (Ticket > 0) {
+                        try {
+                            Thread.currentThread().sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        System.out.println(Thread.currentThread().getName() + "已经出售" + Ticket + "张票");
+                        Ticket--;
+                    }
+                }
+            }
+        }
+    (1) 三个线程同时在买第100张票:
+            三个线程都没来得及执行Ticket--, que都执行了System.out
+    (2) 打印结果出现了-1:
+            当Thick == 1时:
+                线程一进入if, 在执行Thicket-- 前, 线程二也进入if,
+                当线程一先把Thicket减为0后, 线程二的执行就把Thicket减为-1了
+
+同步代码块解决线程数据安全:
+    使用流程:
+        (Demo)
+        SellTicket st = new SellTicket(100);
+
+        Thread t1 = new Thread(st, "窗口1");
+        Thread t2 = new Thread(st, "窗口2");
+        Thread t3 = new Thread(st, "窗口3");
+
+        t1.start();
+        t2.start();
+        t3.start();
+
+        (SellTicket类)
+        public class SellTicket implements Runnable{
+            private int Ticket;
+
+            @Override
+            public void run() {
+
+                while (true) {
+                    synchronized ("lock") {                         //synchronized (任意的对象)  注意: 必须是同一个对象
+                        if (Ticket > 0) {
+                            System.out.println(Thread.currentThread().getName() + "已经出售出售" + count + "张票");
+                            Ticket--;
+                            count++;
+                            try {
+                                Thread.currentThread().sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+    基本说明:
+        描述了线程数据安全问题出现的条件
+        给出了破坏出现条件, 进而解决线程数据安全的思想
+        给出同步代码块Synchronized(Object o)方法实现了该思想
+    线程数据安全问题出现的三个条件:
+        1. 多线程环境
+        2. 具有共享数据
+        3. 多个线程同时通过 多条语句 操作共享数据
+    解决多线程数据安全的思想:
+        基本思想: 让程序没有安全问题出现的环境
+    实现:
+        把 多条语句操作共享数据的代码 锁起来, 让任一时刻只能有一个线程执行这些代码
+        java提供Synchronized(任意对象)方法 --> 同步代码锁
+    Synchronized(Object o){ 多条语句操作数据的代码; } :
+        被锁住的代码, 只能让一个线程全执行完, 之后其他线程才可能获得执行权
+        多个线程使用同一个Object(随便什么类)的对象, 才算是一把锁
+        不能直接在形参中new对象, 因为这是多个锁而不是一个锁
+
+同步代码块封装为同步方法:
+    -->[静态同步方法]
+        (SellTicket类)
+        public class SellThicket implements Runnable{
+            private static int ticket;                              //静态成员变量, 静态方法只能调用静态成员变量
+
+            @Override
+            public void run() {                                     //run()方法
+
+                while (true) {
+                    sellThicket();
+                }
+            }
+
+            //同步方法 锁对象为this
+            public static synchronized void sellThicket() {         //静态同步方法
+                if (ticket > 0) {
+                    try {
+                        Thread.currentThread().sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    System.out.println(Thread.currentThread().getName() + "已经出售出售" + ticket + "张票");
+                    ticket--;
+                }
+            }
+        }
+
+
+    -->[普通同步方法]
+        (SellTicket类)
+        public class SellThicket implements Runnable{
+            private int ticket;                                     //普通成员变量
+
+            @Override
+            public void run() {                                     //run()方法
+
+                while (true) {
+                    sellThicket();
+                }
+            }
+
+            //同步方法 锁对象为this
+            public synchronized void sellThicket() {         //普通同步方法
+                if (ticket > 0) {
+                    try {
+                        Thread.currentThread().sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    System.out.println(Thread.currentThread().getName() + "已经出售出售" + ticket + "张票");
+                    ticket--;
+                }
+            }
+        }
+
+    基本说明:
+        使用Synchronized关键字修饰为方法内部代码加锁
+        非静态方法的默认锁对象是this --> 本类实例对象的地址
+        静态方法的默认锁对象是 类名.getClass() -->即类对象的地址
+    重点问题:
+        考虑到普通同步方法和静态同步方法的锁不同, 因此其使用场景也应该有所不同
+
+线程安全的类:
+    使用流程:
+        StringBuilder sb = new StringBuilder();
+        //获取StringBuilder线程安全类的方式
+        StringBuffer sb2 = new StringBuffer();                      //StringBuffer类
+
+
+        ArrayList<String> array = new ArrayList<>();
+        //获取ArrayList<T>线程安全类的方式
+        List<String> array1 = Collections.synchronizedList(new ArrayList<>());      // List<T> Collections.synchronizedList(List list)方法
+        Vector<String> vector = new Vector<>();
+
+
+        HashMap<String, String> hm = new HashMap<>();
+        //获取HashMap<K, T>线程安全类的方式
+        Map<String, String> hm2 = Collections.synchronizedMap(new HashMap<String, String>());   // Map<K, T> Collections.synchronizedMap(Map map)方法
+        Hashtable<String, String> hmt= new Hashtable<>();
+    基本说明:
+        描述了几种常用类的线程安全类, 和获取的方式
+
+    StringBuilder的线程安全类:
+        StringBuffer:
+            是StringBuilder的线程安全类, 用法完全相同, 牺牲了速度
+            单线程建议用StringBuilder
+
+    ArrayList<T>的线程安全类:
+        Collections.synchronizedList(List list):
+            返回一个线程安全的List或子类List
+            返回的List, 其底层实现方式取决于参数是ArrayList还是LinkedList
+        Vector<T>:
+            是ArrayList<T>的线程安全类, 用法完全相同, 牺牲了速度
+            单线程建议用ArrayList<T>
+
+    HashMap<K, T>的线程安全类:
+        Collections.synchronizedMap(Map map):
+            返回一个线程安全的Map或子类Map
+        HashTable<K, T>:
+            是HashMap<K, T>的线程安全类, 用法完全相同, 牺牲了速度
+            单线程建议同HashMap<K, T>
+
+    关于List的理解:
+        List是一个接口，而ArrayList是List接口的一个实现类。
+            ArrayList类继承并实现了List接口。
+            因此，List接口不能被构造，也就是我们说的不能创建实例对象，但是我们可以像下面那样为List接口创建一个指向自己的对象引用，
+            而ArrayList实现类的实例对象就在这充当了这个指向List接口的对象引用。
+
+Lock锁:
+    使用方法:
+	    (SellTicket类)
+	    public class sellTicket implements Runnable {
+	    private int ticket = 100;
+	    private final ReentrantLock lock = new ReentrantLock();             //创建Lock对象
+
+	    @Override
+	    public void run() {
+	        while (true) {
+	            try {                                                       //try{...;}finally{...;}
+	                lock.lock();                                            //lock方法
+	                try {
+	                    Thread.sleep(100);
+	                } catch (InterruptedException e) {
+	                    e.printStackTrace();
+	                }
+
+	                for (int i = 0; i <= 100; i++) {
+	                    System.out.println(Thread.currentThread().getName() + ": 已经卖出第" + ticket + "张票");
+	                    ticket--;
+	                }
+	            } finally {                                                 //确保一定解锁
+	                lock.unlock();                                          //unlock()方法
+	            }
+	        }
+	    }
+    基本说明:
+        Lock类是一个接口, 不能直接实例化
+        常使用它的实现类ReentrantLock()创建对象, 来调用lock()和unlock()方法
+        为保证解锁代码一定执行, 使用try...finally...的方式编写代码
+        Lock锁提供了一种更加直观的加锁和释放锁的方法
+        Lock类提供了lock()方法和unlock方法()获取和释放锁
+    保证解锁代码一定执行的方法:
+        ReentrantLock() lock = new ReentrantLock();
+        try {
+            lock.lock();
+            线程同步代码;
+        } finally {
+            lock.unlock();
+        }
+
+生产者消费者:
+    使用流程:
+        --> 请查看代码
+    目标: 每生产一瓶奶, 就拿一瓶奶, 不多生产, 也不多拿!!
+    基本说明:
+        生产数据(多线程) --> 共享数据区域 <-- 消费数据(多线程)
+        为了体现生产和消费过程中的等待和唤醒, java在Object类中提供了wait()方法, notify()方法, notifyAll()方法
+        wait()方法, notify()方法, notifyAll()方法必须在
+            相同的锁对象下(监视器), 具有多个线程, 否找抛出
+    生产者消费者模型:
+        生产数据(多线程) --> 共享数据区域 <-- 消费数据(多线程)
+            生产者生成数据之后直接放置在共享数据区中, 并不需要关心消费者行为
+            消费者只需要从共享数据区中获取数据, 并不需要关心生产者的行为
+    Object类的成员方法:
+        void wait():
+            导致当前线程等待, 直到另一个线程调用该对象的notify()或notifyAll()方法
+        void notify():
+            唤醒正在等待的(对象监视器中)单个线程
+        void notifyAll():
+            唤醒正在等待的(对象监视器中)所有线程

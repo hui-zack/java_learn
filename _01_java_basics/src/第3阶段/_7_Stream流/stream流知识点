@@ -1,0 +1,363 @@
+Stream流知识点目录:
+    String流知识体系:
+
+    体验Stream流:
+    Stream流的使用:
+
+    Stream流的生成操作:
+    Stream流的中间操作_过滤filter:
+    Stream流的中间操作_前取limit_跳过skip:
+    Stream流的中间操作_合流concat_去重distinct:
+    Stream流的中间操作_元素类型转换_map 和 元素转为int类型_mapToInt:
+    Stream流的终结操作_遍历消费forEach_元素个数统计count
+
+    Stream流的收集操作:
+
+
+String流知识体系:
+    Stream流的生成操作:
+        Collection:                             --> Collection
+            list.stream()
+            set.stream()
+        Map:                                    --> Map
+            map.keySet().stream()
+            map.values().stream()
+        int[] intArray:                         --> 数组
+            Stream.of(intArray)
+
+    Stream流的中间操作:
+        filter(Predicate predicate)             --> 过滤
+
+        limit(long maxSize)                     --> 前取
+        Skip(long n)                            --> 跳过
+
+        concat(Stream a, Stream b)              --> 合并流
+        distinct()                              --> 去重
+
+        map(Function mapper)                    --> 转换流的数据类型
+            map(Actor::new):
+                返回一个元素为Actor对象的Stream流
+        mapToInt(ToIntFunction mapper):         --> 转换流的数据类型为int
+            特有方法int sum()
+
+    Stream流的终结操作:
+        forEach(Consumer action)                --> 流元素遍历消费
+        count()                                 --> 流元素个数统计
+
+    Stream流的收集操作:
+        Stream1.collect(Collectors.toList())                                            --> 流收集为List集合
+        Stream2.collect(Collectors.toSet())                                             --> 流收集为Set集合
+        Stream3.collect(Collectors.toMap(Function keyMapper, Function valueMapper))     --> 流收集为Map集合
+
+体验Stream流:
+    使用流程:
+        ArrayList<String> array = new ArrayList<>();
+        array.add("张曼玉");
+        array.add("吴亦凡");
+        array.add("张辉");
+        array.add("张三丰");
+        array.add("林青霞");
+        array.add("张子栋");
+
+
+        getResult(array);               //普通代码实现需求
+        streamResult(array);            //stream流实现需求
+
+
+        private static void getResult(ArrayList<String>  list) {                //普通实现
+            ArrayList<String> list1 = new ArrayList<>();
+            for (String s : list) {
+                if (s.startsWith("张") && s.length() == 3) {
+                    list1.add(s);
+                }
+            }
+
+            for (String s : list1) {
+                System.out.println(s);
+            }
+            System.out.println();
+        }
+
+
+        private static void streamResult(ArrayList<String> list) {               //stream调用过滤器(filter方法), 实现判断接口Predicate, forEach方法实现消费接口Consumer
+            list.stream().filter( s -> s.startsWith("张")).filter(s -> s.length() == 3).forEach(System.out::println);
+        }
+    基本说明:
+        需求:
+            创建一个集合, 存储多个字符串元素
+            把集合中所有以"张"开头的元素存储到一个新的集合
+            把"张"开头的集合中的长度为3的元素存储到一个新的集合
+
+
+Stream流的使用:
+    使用流程:
+        Stream<String> manStream = manList.stream().filter(s -> s.length() == 3).limit(3);         //男演员只要名字为3个字的前三人
+        Stream<String> womanStream = womanList.stream().filter(s -> s.startsWith("林")).skip(1);    //女演员只要姓林的, 并且不要第一个
+        Stream<String> concatStream = Stream.concat(manStream, womanStream);                        //把过滤后的男演员和女演员合并到一起
+
+        concatStream.map(Actor::new).forEach(System.out::println);                                  //把上一步操作后的元素元素作为构造方法的参数创建演员对象, 遍历数据
+            /*
+                map(Actor::new)返回一个元素为Actor对象的Stream流
+            */
+    生成流:
+        list.stream()
+        有集合, 数组等数据源产生
+    中间操作:
+        .filter()
+        一个流后面可跟多个中间操作
+        中间操作总是在处理完数据后返回一个新的流
+    终结操作:
+        .forEach( s -> System.out.println(s))
+        常使用消费性接口Consumer, 重写其accept方法消费数据
+        一个流只能有一个总结操作, 当这个操作执行后, 流就被使用"光"了, 无法再被操作
+
+
+Stream流的生成操作:
+    使用流程:
+        ArrayList<String> list = new ArrayList<>();                             //Collection集合生成Stream流
+        Stream<String> listStream = list.stream();
+
+        HashSet<String> set = new HashSet<>();
+        Stream<String> setStream = set.stream();
+
+
+        Map<String, Integer> map = new HashMap<>();
+        Stream<String> keyStream = map.keySet().stream();                       //Map生成key的Stream流
+        Stream<Integer> values = map.values().stream();                         //map生成value的Stream流
+
+        String[] strArray = {"hello", "java", "world"};
+
+        Stream<String> strArrayStream = Stream.of(strArray);                    //数组的Stream流, 方式1
+        Stream<String> strArrayStream1 = Stream.of("hello", "java", "world");   //数组的Stream流, 方式1
+    基本说明:
+
+    Stream流的常见生成方式:
+        Collection集合生成Stream流:
+            list.stream()
+            体系集合可以使用默认方法stream()生成Stream流:
+                default Stream<T> stream()
+
+        Map集合生成Stream流:
+            key的Stream流:
+                map.keySet().stream()
+            values的Stream流:
+                map.values().stream()
+
+        数组生成Stream流:
+            Stream.of(strArray)
+            数组使用Stream调用类方法of(T... values)生成Stream流:
+                public static<T> Stream<T> of(T... values)
+
+Stream流中间操作_过滤filter:
+    使用流程:
+        ArrayList<String> list = new ArrayList<>();
+        list.add("林青霞");
+        list.add("张曼玉");
+        list.add("王祖贤");
+        list.add("柳岩");
+        list.add("张敏");
+        list.add("张无忌");
+
+        list.stream().filter( s -> s.startsWith("张")).forEach(System.out::println);     //filter(Predicate predicate)方法; 输出所有张开头的元素
+
+        list.stream().filter( s -> s.length() == 3).forEach(System.out::println);       //filter(Predicate predicate)方法; 输出所有长度为3的元素
+
+        list.stream().filter( s -> s.startsWith("张")).filter( s -> s.length() == 3).forEach(System.out::println);   //输出所有以张开头, 长度为3的元素
+
+    基本说明:
+        filter实际上是一个接口操作方法, 参数为参数判断接口Predicate
+        Predicate接口的唯一抽象方法为 boolean test(T t)
+
+    流过滤_Filter方法:
+        Stream<T> filter(Predicate predicate):
+            Lambda重写boolean test(T t)对参数进行判断, 返回一个布尔值
+
+Stream流的中间操作_前取limit_跳过skip:
+    使用流程:
+        ArrayList<String> list = new ArrayList<>();
+        list.add("张曼玉");
+        list.add("林青霞");
+        list.add("王祖贤");
+        list.add("柳岩");
+        list.add("张敏");
+        list.add("张无忌");
+
+        list.stream().limit(3).forEach(System.out::println);        //limit(long maxSize)方法; 取前三个数据在控制台输出
+        System.out.println();
+
+        list.stream().skip(3).forEach(System.out::println);         //Skip(long n); 跳过3个元素, 把剩下的元素在控制台输出
+        System.out.println();
+
+        list.stream().skip(2).limit(2).forEach(System.out::println);
+    基本说明:
+        Stream流的 前取limit
+        Stream流的 跳过skip
+
+    流元素前取_limit方法:
+        Stream<T> limit(long maxSize):
+            根据元素索引, 从前往后截取部分元素并返回, maxSize为索引的长度
+
+    流元素跳过_skip方法:
+        Stream<T> Skip(long n):
+            根据元素索引, 跳过部分元素, 其他的元素返回, n为跳过的个数
+
+Stream流的中间操作_合流concat_去重distinct:
+    使用流程:
+        ArrayList<String> list = new ArrayList<>();
+        list.add("张曼玉");
+        list.add("林青霞");
+        list.add("王祖贤");
+        list.add("柳岩");
+        list.add("张敏");
+        list.add("张无忌");
+
+        Stream<String> stream1 = list.stream().limit(4);
+        Stream<String> stream2 = list.stream().skip(2);
+
+        Stream.concat(stream1, stream2).forEach(System.out::println);                //concat(Stream s1, Stream s2)方法; 合并流, 把新的流在控制台输出
+
+        Stream.concat(stream1, stream2).distinct().forEach(System.out::println);     //distinct()方法; 合并流, 去掉新流中重复的元素, 要求字符串不能重复
+
+    基本说明:
+        合并_concat方法, 注意是静态方法, 只能通过类名调用
+        去重_distinct方法
+
+    合并流_concat方法:
+        static<T> Stream<T> concat(Stream a, Stream b):
+            将a, b合并为一个Stream流, 合并后可能会有重复
+
+    流元素去重_distinct方法:
+        Stream<T> distinct():
+            去掉Stream流中的重复元素后返回
+
+Stream流的元素类型转换 map 和 mapToInt:
+    使用流程:
+        ArrayList<String> list = new ArrayList<>();
+        list.add("10");
+        list.add("20");
+        list.add("30");
+        list.add("40");
+        list.add("50");
+
+        list.stream().map(Integer::parseInt).forEach(System.out::println);      //map(Function mapper)方法; map转换Stream流元素的类型为int
+
+        int sum = list.stream().mapToInt(Integer::parseInt).sum();              //mapToInt(ToIntFunction mapper); mapToInt转化Stream流元素的类型为int; mapToInt特有的sum()方法
+        System.out.println(sum);
+
+    基本说明:
+        Stream流元素类型转换     map方法
+        Stream流元素类型转为int  mapToInt方法:
+            含有特有的sum()方法
+        map(Actor::new)返回一个元素为Actor对象的Stream流
+
+    元素类型转换 map方法:
+        <R> Stream<R> map(Function mapper):
+            转换Stream流的元素类型 返回一个新流
+            Lambda重写参数转换接口Function, 实现流元素类型的转换
+
+    元素类型转为int类型 mapToInt方法:
+        intStream mapToInt(ToIntFunction mapper):
+            只能将Stream流的元素类型转换为int, 返回一个新流
+            和map的区别是它还有一个sum()方法用来求和
+
+
+Stream流的终结操作_遍历消费forEach_元素个数统计count
+    使用流程:
+        ArrayList<String> list = new ArrayList<>();
+        list.add("张曼玉");
+        list.add("林青霞");
+        list.add("王祖贤");
+        list.add("柳岩");
+        list.add("张敏");
+        list.add("张无忌");
+
+        list.stream().forEach(System.out::println);                         //forEach(Consumer action)方法; 把集合中的元素在控制台输出
+        long num = list.stream().filter(s -> s.startsWith("张")).count();   //count()方法; 统计集合中以张开头的元素个数输出到控制台
+        System.out.println(num);
+    基本说明:
+        遍历消费 forEach方法
+        元素个数统计 count方法
+    遍历消费 forEach方法:
+        void forEach(Consumer action):
+            对每个元素执行操作
+            Lambda重写Consumer接口的抽象方法accept(T t), 进行消费
+
+    元素个数统计 count方法:
+        long count():
+            返回此流的元素个数
+
+
+Stream流的收集操作:
+    使用流程:
+    -->[Stream流收集为list]
+
+        List<String> list = new ArrayList<>();
+        list.add("林青霞");
+        list.add("张曼玉");
+        list.add("王祖贤");
+        list.add("柳岩");
+
+        Stream<String> listStream = list.stream().filter(s -> s.length() == 3);
+
+        List<String> list1 = listStream.collect(Collectors.toList());                   //<R> collect(Collectors.toList())方法, Stream流收集List
+
+
+    -->[Stream流收集为Set]
+
+        Set<Integer> set = new HashSet<>();
+        set.add(10);
+        set.add(20);
+        set.add(30);
+        set.add(33);
+        set.add(35);
+
+        Stream<Integer> setStream = set.stream().filter(i -> i > 25);
+
+        Set<Integer> set1 = setStream.collect(Collectors.toSet());                    //<R> collect(Collectors.toSet())方法, Stream流收集为set
+        for (int i : set1) {
+            System.out.println(i);
+        }
+        System.out.println();
+
+
+    -->[Stream流收集为Map]
+
+        String[] strArray ={"林青霞, 30", "张曼玉, 35", "王祖贤, 33", "柳岩, 25"};
+
+        Stream<String> arrayStream = Stream.of(strArray).filter(s -> Integer.parseInt(s.split(", ")[1]) > 28);
+
+        Map<String, String> map = arrayStream.collect(Collectors.toMap((s -> s.split(", ")[0]), (s -> s.split(", ")[1])));
+                                                            //<R> collect(Collectors.toMap(Function keyMapper, Function valueMapper))方法, Stream流收集为map
+
+    基本说明:
+        Stream1.collect(Collectors.toList())                                            --> 流收集为List集合
+        Stream2.collect(Collectors.toSet())                                             --> 流收集为Set集合
+        Stream3.collect(Collectors.toMap(Function keyMapper, Function valueMapper))     --> 流收集为Map集合
+    收集方法:
+        List collect(Collectors.toList())
+            说明:
+                收集为List:
+                返回值是泛型表示的List
+            实例:
+                Stream1.collect(Collectors.toList())
+
+        Set collect(Collectors.toSet())
+            说明:
+                收集为Set
+                返回值是泛型表示的Set
+            实例:
+                Stream2.collect(Collectors.toSet())
+
+        Map collect(Collectors.toMap(Function keyMapper, Function valueMapper))
+            说明:
+                收集为Map
+                Lambda重写两个Function接口的R apply(T t)方法
+                返回值是泛型表示的Map
+            实例:
+                Stream3.collect(Collectors.toMap(Function keyMapper, Function valueMapper))
+
+
+
+
+
+

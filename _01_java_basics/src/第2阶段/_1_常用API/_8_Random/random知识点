@@ -1,0 +1,6 @@
+第1阶段._5_类和对象.模块Random:  //用于产生随机数
+    使用方法:
+        import java.util.第1阶段._5_类和对象.模块Random         //导包
+
+        第1阶段._5_类和对象.模块Random r = new 第1阶段._5_类和对象.模块Random()     //获取对象
+        int number = r.nextInt(10)  //(10) -> 1到9

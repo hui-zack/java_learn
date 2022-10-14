@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>tomcat_set_maven</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <!--
+      <packaging>: 打包方式
+          默认打包为jar包
+          web项目设定为war
+    -->
+    <packaging>war</packaging>
+
+    <dependencies>
+        <dependency>
+            <!-- 添加servlet依赖 -->
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope> <!-- maven运行时有自己的servlet 只在编译测试阶段生效!! -->
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <!--添加Tomcat插件 -->
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <port>80</port>   <!-- 设置端口号 -->
+                    <path>/</path>    <!-- 设置项目访问路径 -->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>7</source>
+                    <target>7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

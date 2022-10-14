@@ -1,0 +1,129 @@
+
+模块化知识点接口:
+        模块下的接口. 可通过模块文件导出:
+            exports 包名;                                   //模块出包
+            provides 接口名 with 实现类名;                    //指定该接口被调用的实习类
+        使用其他模块的接口, 可通过模块文件导入:
+            requires 包名;                                  //模块接包
+            uses 接口名;                                    //使用包, 该包的实现类已在出包模块中定义
+
+        demo中使用其他模块的接口:
+            ServiceLoader.load(Class<S> service):
+模块化概述:
+    模块化要解决的问题:
+        无论是运行一个大型的软件, 还是运行一个小的程序, 及时程序只需要使用java的部分功能, jvm也需要加载整个JRE环境
+    解决方案:
+        java9正式推迟了模块化系统, java被拆分为多个模块
+        java程序可以根据需要选择加载程序必须的Java模块, 让java以轻量化的方式运行
+    模块化的使用方式:
+        一个项目可拆分为多个模块, 每个模块都是独立的
+        调用其他模块中的类需要module-info.java文件声明
+
+模块化的基本使用:
+    使用流程:
+    /*
+        新建一个项目, 创建两个模块myOne和MyTwo
+        MyOne模块要调用myTwo模块Package2包中的Student类
+    */
+    --> [模块MyOne的操作]
+
+        (module-info 模块调包声明)
+            module myOne {
+                requires myTwo;                         //接收myTwo的包
+            }
+        (MyOne)
+            Student s = new Student();
+            s.study();
+
+    --> [模块MyTwo的操作]
+
+        (module-info 模块调包声明)
+        module myTwo {
+            exports package2;                           //输出本模块下的package2包
+        }
+
+    基本说明:
+        输出模块输出的是包
+        接收模块接收的是模块
+
+    模块调包声明代码格式:
+        输出模块:
+            exports 包名;
+                输出本模块的包
+        接收模块:
+            requires 模块名;
+                接收该模块的所有输出包
+
+
+    具体内容:
+        (在模块的src目录下新建一个名为module-info.java的描述性文件)
+        模块中所有未导出的包都是模块私有的, 他们是不能在模块之外访问的
+            模块导出格式:
+                export 包名;
+        一个模块要方法其他模块, 必须明确指定依赖哪些模块, 未明确指定的模块不能访问
+                requires 模块迷宫
+
+面向接口编程-服务提供和使用:
+    使用流程:
+    --> [导出模块 myTwo]
+        (module-info.java myTwo模块的声明文件)
+        module myTwo {
+            exports package2;                                                           //导出本模块的package2包
+            exports Inter;                                                              //导出本模块的Inter包
+            provides MyService with MyServiceImpl2;                                     //导出MyServers接口时使用MyServiceImpl2实现类
+        }
+
+    --> [使用模块 myOne]
+        (module-info.java myOne模块的声明文件)
+            module myOne {
+                requires myTwo;                                                          //接收myTwo模块的所有包
+                uses MyService;                                                          //使用MyService接口, 实现类被myTwo指定
+            }
+
+        (Demo)
+            ServiceLoader<MyService> services = ServiceLoader.load(MyService.class);     //ServiceLoader.Load(Class ServiceName)方法,  加载模块服务
+            for (MyService ms: services) {                                               //ServiceLoader类实现了Iterable接口, 可使用增强for遍历
+                ms.service();
+            }
+
+
+
+    基本说明:
+        模块下的接口. 可通过模块文件导出:
+            exports 包名;                                   //导出模块下的包
+            provides 接口名 with 实现类名;                    //指定该接口被调用的实习类
+        使用其他模块的接口, 可通过模块文件导入:
+            requires 包名;                                  //接收包
+            uses 接口名;                                    //使用包, 该包的实现类已在出包模块中定义
+
+
+    ServiceLoader.load(Class<S> service)方法:
+        模块服务加载方法
+        返回 一个服务(即接口实现类)调用对象的数组
+        参数为:
+            需调用的接口名的Class对象, 如:
+                MyService.class
+
+        ServiceLoader类:
+            静态Load方法, 加载服务返回接口实现对象数组
+            该类实现了Iterable接口, 可用for循环遍历
+
+    详细内容:
+        (1) 1模块导出包, 配置Module-info.java文件为:
+            module One {
+                exports package2;                                   //导出本模块的package2包
+                exports Inter;                                      //导出本模块的Inter包
+                provides MyService with MyServiceImpl2;             //导出MyServers接口时使用MyServiceImpl2实现类
+            }
+
+        (2) 2模块接收包, 配置Module-info.java文件为:
+            module Two {
+                requires myTwo;                                                          //接收myTwo模块的所有包
+                uses MyService;                                                          //使用MyService接口, 实现类被myTwo指定
+            }
+
+            Demo中调用MyService接口:
+            ServiceLoader<MyService> services = ServiceLoader.load(MyService.class);     //ServiceLoader.Load(Class ServiceName)方法,  加载模块服务
+            for (MyService ms: services) {                                               //ServiceLoader类实现了Iterable接口, 可使用增强for遍历
+                ms.service();
+            }

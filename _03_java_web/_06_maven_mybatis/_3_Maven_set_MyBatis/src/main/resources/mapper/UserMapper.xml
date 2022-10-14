@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    sql映射文件
+-->
+<mapper namespace="mapper.UserMapper">  <!-- 这里找java目录下的接口 -->
+    <!--
+        数据库操作接口(比如UserMapper)的路径和名称:
+            应该和该接口的xml配置文件的目录结构和文件名完全一致
+            例如:
+                java.mapper.UserMapper.java      接口
+                resources.mapper.UserMapper.xml  配置文件
+    -->
+    <select id="selectAll" resultType="pojo.User">
+        /*
+            本结点定义了mapper.UserMapper.java接口中的sql方法
+        */
+        select * from tb_user;
+    </select>
+</mapper>

@@ -1,0 +1,241 @@
+目录:
+    SpringJDBC概念和环境:
+    SpringJDBC的使用:
+
+知识点架构:
+    创建JdbcTemplate对象:
+        JdbcTemplate template = new JdbcTemplate(DruidUtils.getDataSource());
+
+    更新数据:
+        String sql = "update emp set salary = ? where id = ?";
+        int count = template.update(sql, 20000, 1);
+
+    插入条数据:
+        String sql = "insert into emp(id, ename, dept_id) value (?, ?, ?)";
+        int count = template.update(sql, 14, "犬夜叉", 10);
+
+    删除条数据:
+        String sql = "delete from emp where id =?";
+        int count = template.update(sql, 14);
+
+    查询一条返为map
+        String sql = "select * from emp where id = ?";
+        Map<String, Object> empLineMap = template.queryForMap(sql, 1);
+
+    查询多条返为List, 元素类型固定为<Map<String, Object>>
+        String sql = "select * from emp ";
+        List<Map<String, Object>> lineMaps = template.queryForList(sql);
+
+    查询多条返为List, 元素类型为自定义的JavaBean:
+        自动封装JavaBean:
+            sql = "select * from emp"
+            List<Emp> mapList = template.query(sql, new BeanPropertyRowMapper<Emp>(Emp.class));
+
+        手动封装JavaBean:
+            List<Emp> maps = template.query(sql, new RowMapper<Emp>() {
+                    @Override
+                    public Emp mapRow(ResultSet rs, int i) throws SQLException {
+                        int id = rs.getInt("id");
+                        String ename = rs.getString("ename");
+                        int job_id = rs.getInt("job_id");
+                        int mgr = rs.getInt("mgr");
+                        Date joindate = rs.getDate("joindate");
+                        double salary = rs.getDouble("salary");
+                        double bonus = rs.getDouble("bonus");
+                        Integer dept_id = rs.getInt("dept_id");
+
+                        Emp emp = new Emp(id, ename, job_id, mgr, joindate, salary, bonus, dept_id);
+
+                        return emp;
+                    }
+                });
+    查询聚合函数
+        String sql = "select count(id) from emp";
+        Long total = template.queryForObject(sql, Long.class);      //* template.queryForObject(sql, arg); arg为查询结果的类型的class
+
+
+
+SpringJDBC基础:
+    概念:
+        spring框架对jdbc的简单封装, 提供了一个JDBCTemplate对象简化JDBC的开发
+
+    SpringJDBC环境搭建:
+        导入五个jar包:
+
+
+SpringJDBC的使用:
+    使用流程:
+        JdbcTemplate template = new JdbcTemplate(DruidUtils.getDataSource());
+
+        (1 bd3.emp中id为1的数据, 修改salary值为10000)
+
+            String sql = "update emp set salary = ? where id = ?";
+            int count = template.update(sql, 20000, 1);                             //*
+            System.out.println("emp update lines: %d".formatted(count));
+
+
+
+        (2 在emp表中添加一条记录)
+
+            String sql = "insert into emp(id, ename, dept_id) value (?, ?, ?)";
+            int count = template.update(sql, 14, "犬夜叉", 10);
+            System.out.println(count);
+
+        (3 删除emp表中的添加的数据)
+            String sql = "delete from emp where id =?";
+            int count = template.update(sql, 14);
+            System.out.println("delete line: %s".formatted(count));
+
+
+
+        (4 查询id为1的记录, 将其封装为map集合)
+            String sql = "select * from emp where id = ?";
+
+            Map<String, Object> empLineMap = template.queryForMap(sql, 1);
+            System.out.println(empLineMap);
+        }
+
+
+        (5 查询emp表的所有记录, 并返回为List<map<String, Object>>:
+
+            String sql = "select * from emp ";
+            List<Map<String, Object>> lineMaps = template.queryForList(sql);
+            for (Map<String, Object> map : lineMaps){
+                System.out.println(map);
+
+
+
+        (6 查询所有记录, 并将其封装为javaBean对象(Emp对象))
+            String sql = "select * from emp";
+
+            --> [自动封装 query(sql, arg)封装javaBean并返回]
+                //javaBean的类变量不能为基本数据类型, 因为基本数据类型不能接受null(数据库中存的null), 只能为包装类.
+
+                List<Emp> mapList = template.query(sql, new BeanPropertyRowMapper<Emp>(Emp.class));
+                for (Emp e: mapList){
+                    System.out.println(e);
+                };
+
+
+            --> [手动封装]
+                List<Emp> maps = template.query(sql, new RowMapper<Emp>() {
+                    @Override
+                    public Emp mapRow(ResultSet rs, int i) throws SQLException {
+
+                        int id = rs.getInt("id");
+                        String ename = rs.getString("ename");
+                        int job_id = rs.getInt("job_id");
+                        int mgr = rs.getInt("mgr");
+                        Date joindate = rs.getDate("joindate");
+                        double salary = rs.getDouble("salary");
+                        double bonus = rs.getDouble("bonus");
+                        Integer dept_id = rs.getInt("dept_id");
+
+                        Emp emp = new Emp(id, ename, job_id, mgr, joindate, salary, bonus, dept_id);
+
+                        return emp;
+                    }
+                });
+
+                for (Emp e: maps){
+                    System.out.println(e);
+                };
+        (7 查询总记录数)
+            String sql = "select count(id) from emp";
+            Long total = template.queryForObject(sql, Long.class);      //* template.queryForObject(sql, arg); arg为查询结果的类型的class
+            System.out.println(total);
+
+    基本使用流程:
+        创建JdbcTemplate对象:
+            JdbcTemplate template = new JdbcTemplate(DruidUtils.getDataSource());
+
+        更新数据:
+            String sql = "update emp set salary = ? where id = ?";
+            int count = template.update(sql, 20000, 1);
+
+        插入条数据:
+            String sql = "insert into emp(id, ename, dept_id) value (?, ?, ?)";
+            int count = template.update(sql, 14, "犬夜叉", 10);
+
+        删除条数据:
+            String sql = "delete from emp where id =?";
+            int count = template.update(sql, 14);
+
+        查询一条返为map
+            String sql = "select * from emp where id = ?";
+            Map<String, Object> empLineMap = template.queryForMap(sql, 1);
+
+        查询多条返为List, 元素类型固定为<Map<String, Object>>
+            String sql = "select * from emp ";
+            List<Map<String, Object>> lineMaps = template.queryForList(sql);
+
+        查询多条返为List, 元素类型为自定义的JavaBean:
+            自动封装JavaBean:
+                sql = "select * from emp"
+                List<Emp> mapList = template.query(sql, new BeanPropertyRowMapper<Emp>(Emp.class));
+
+            手动封装JavaBean:
+                List<Emp> maps = template.query(sql, new RowMapper<Emp>() {
+                        @Override
+                        public Emp mapRow(ResultSet rs, int i) throws SQLException {
+                            int id = rs.getInt("id");
+                            String ename = rs.getString("ename");
+                            int job_id = rs.getInt("job_id");
+                            int mgr = rs.getInt("mgr");
+                            Date joindate = rs.getDate("joindate");
+                            double salary = rs.getDouble("salary");
+                            double bonus = rs.getDouble("bonus");
+                            Integer dept_id = rs.getInt("dept_id");
+
+                            Emp emp = new Emp(id, ename, job_id, mgr, joindate, salary, bonus, dept_id);
+
+                            return emp;
+                        }
+                    });
+        查询聚合函数
+            String sql = "select count(id) from emp";
+            Long total = template.queryForObject(sql, Long.class);      //* template.queryForObject(sql, arg); arg为查询结果的类型的class
+
+
+    JDBCTemplate类详解:
+        创建JdbcTemplate对象:
+            JdbcTemplate template = new JdbcTemplate(DruidUtils.getDataSource());
+                参数为DateSource对象
+
+        JdbcTemplate的成员方法
+            int update(String sql, *arg):
+                执行DML语句, 数据增删改
+                *arg为?赋值, 如:
+                    template.update(sql, 2);
+                    template.update(sql, 2, "zhangsan")
+
+            Map<String, Object> queryForMap(String sql, *arg):
+                查询后将结果集封装为map集合
+                将列名作为key, 值作为value,封装为一个map集合返回
+                sql的结果必须是1条条数据:
+
+            List<Map<String, Object>> queryForList(String sql, *arg):
+                查询后将结果集封装为list集合
+                将每一条数据都封装为map集合, 所有map集合封装为List
+
+            List<Emp> query(sql, arg):
+                查询后将结果封装为指定的JavaBean对象
+                arg:                                            // Emp是一个JavaBean
+                    new BeanPropertyRowMapper<Emp>(Emp.class):
+                        根据Emp的class文件, Spring自动封装为Emp返回结果
+                        javaBean的类变量不能为基本数据类型, 因为基本数据类型不能接受null(数据库中存的null), 只能为包装类.
+                    new RowMapper<Emp>(){ 重写mapRow方法 }:
+                        手动封装为Emp对象
+
+            queryForObject(sql, arg):
+                查询后将聚合函数的结果返回
+                参数为sql和arg, arg指 聚合函数结果的包装类class
+                arg:
+                    Long.class
+                    Integer.class
+                    Double.class
+                    String.class
+                    ...
+
+
+

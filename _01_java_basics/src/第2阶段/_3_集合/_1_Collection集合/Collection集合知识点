@@ -1,0 +1,499 @@
+Collection集合知识点目录:
+    Collection -->
+        集合结构:
+
+        Collection(单列集合):
+        Iterator:
+        
+        List:
+        ListIterator:
+        
+        增强for循环:
+        数据结构:
+        
+        ArrayList:
+        LinkedList:
+
+        Set:
+        HashSet:
+        LinkedHashSet:
+        TreeSet:
+        TreeSet元素的类实现Comparable<E e>排序:
+        TreeSet比较器Comparator排序:
+集合结构:
+    基本说明:
+        集合类特点:提供一种存储空间可变的存储模型, 存储的数据容量可随时发生改变
+    集合的种类/体系结构:
+        结构图:
+            Collection(接口):     //单列
+                List(接口):           //可重复
+                    ArrayList(实现类):     //数组实现List, 查询快
+                    LinkList(实现类):      //链表实现List, 增删快
+                    ...
+                set(接口):            //不可重复
+                    TreeSet          //可排序
+                        排序:
+                            Comparable  //接口实现类, 在定义类是重写
+                            Comparator  //接口操作类, 在使用TreeSet时内部类使用
+
+                    HashSet
+                        LinkedHashSet
+            Map(接口):            //多列
+                HashMap(实现类):
+                ...
+Collection(单列集合):
+    使用流程:
+        Collection<String> c = new ArrayList<String>();
+        c.add("hello");
+        c.add("world")
+
+    基本说明:
+        是单列集合的顶层接口, 表示一组对象, 这些对象也被称为Collection的元素
+        jdk不提供此接口的任何直接实现方式, 它提供具体的子接口(如Set和List)实现
+        是一个接口
+
+    创建对象:
+        通过多态的方法创建对象:
+            Collection<String> c = new Collection<String>;
+
+    常用方法:
+        boolean add(E e);
+            添加元素
+        boolean contains(Object o);
+            判断集合中是否存在指定的元素
+        boolean remove(Object o);
+            移除的是已经添加的对象
+            从集合中移除指定的元素
+        void clear();
+            清空集合中的元素
+        boolean isEmpty()
+            判断集合是否为空
+        int size();
+            判断集合的长度
+
+Iterator:
+    使用流程:                                             //Iterator遍历Collection集合
+        Collection<String> c = new ArrayList<String>();
+        c.add("hello")
+
+        Iterator<String> it = c.iterator();             //必须在添加元素后面
+        while (c.hasNext()) {       //hasNext()方法
+            String s = c.next();    //next()方法
+            System.out.println(s);
+        }
+
+    基本说明:
+        Iterator()是定义在Collection接中的方法, 即迭代器
+        迭代器是通过集合的Iterator()方法获得, 主要用于集合的遍历
+        迭代器创建对象后, 修改集合的长度不能改变, 否则会发生并发修改异常(集合添加元素必须在创建迭代器对象前面)
+
+    Collection 中的的 Iterator() 方法:
+        方法声明:
+            Iterator<E> iterator():
+        基本说明:
+            返回此集合中元素的迭代器
+            迭代器创建对象后, 修改集合的长度不能改变, 否则会发生并发修改异常
+        Iterator中的常用方法:
+            E next(): 返回迭代中的下一个元素
+            boolean hasNext(): 如果迭代中还有更多元素, 返回true
+
+
+List:
+    使用流程:
+        List<String> list = new ArrayList<String>();     //创建集合
+
+        list.add("hello");                      //add方法
+        list.add("world");
+        list.add("hello");
+
+        System.out.println(list[1]);
+
+        Iterator<String> it = list.iterator();  //遍历
+        while(it.hasNext()) {
+            String s = it.next();
+            System.out.println(s);
+        }
+
+        list.add(1, "hi");      //add(int index, E element)方法
+        list.remove(1);         //remove(int index)方法
+        list.set(2, "javaee");  //set(int index, E element)方法
+        list.get(2);                //get(int index)方法
+
+    基本说明:
+        是一个接口
+        继承Collection,
+        有序集合, 可通过索引访问元素, 或搜索到列表中的元素
+        允许重复的元素
+    特点:
+        有序, 存储和去处的元素顺序一致
+        可重复: 存储的元素可重复
+    遍历:
+        (1)迭代器遍历
+            继承自Collection, 可使用Iterator()方法遍历
+            Iterator<String> it = list.iterator();
+            while (it.hasNext()) {
+                String s = it.next();
+                System.out.println(s);
+            }
+        (2)循环遍历
+            for (int i = 0; i < list.size(); i++ ) {
+                String s = list.get(i);
+                System.out.println(s);
+            }
+    List集合的特有方法:
+        void add(int index, E element)
+            在指定位置插入元素
+            原来的挤到后面, 所以最大的index ==  list.size()
+        E remove(int index)
+            删除指定位置的元素
+        E set(int index, E element)
+            修改指定位置的元素
+        E get(int index)
+            返回指定索引处的元素
+
+    迭代器的并发修改异常:
+        重现流程:
+            List<String> list = new ArrayList<>();
+            list.add("hello");
+            list.add("world");
+            list.add("java");
+
+            Iterator it = list.iterator();
+            while(it.hasNext()) {           //这里产生预期循环次数, 先执行
+                String s = it.next();
+                if(s.equals("world")) {
+                    list.add("javaSE")      //这里改变了长度, 继续循环就错了, 所以java作者抛出了异常
+                }
+            }
+
+        异常类名:
+            ConcurrentModificationException
+        产生原因:
+            迭代器遍历过程中, 如果修改了集合的长度, 造成了迭代器认为的循环次数和实际的循环次数不一致, 所以作者要抛出异常
+        解决方法:
+            使用for循环遍历, 然后用集合对象做相关操作
+
+ListIterator:
+    使用流程:
+        List<String> list = new Arraylist<String>();
+
+        list.add("hello");
+        list.add("world");
+        list.add("world");
+
+        ListIterator lit = list.listIterator();
+
+        while (lit.hasNext()) {
+            String s = lit.next();
+            if (s.equals("java")) {
+                lit.add("javaee");          //注意这里用的是lit对象, 而不是list对象, 是因为listIterator()方法中重写了add()方法, 避免了并发修改异常
+            }
+        }
+
+    基本说明:
+        通过List集合的ListIterator()方法得到, 是List特有的迭代器
+        可从后向前遍历
+        不会引发并发修改异常 (并发修改使用lit.add()方法, (listIterator()方法中的内部类重写了add())作者在每次修改时都将 循环次数 = 长度)
+    获取对象:
+        ListIterator lit = list.listIterator();
+    常用方法:
+        E next()
+            返回迭代中的下一个元素
+        boolean hasNext()
+            如果迭代器中含有更富多元素, 则返回True
+        E previous()
+            返回列表的上一个元素
+        Boolean hasPrevious():
+            如果迭代器的上一个位置有等多元素, 返回True
+        void add(E e)
+            将指定的元素插入列表
+
+增强for循环:
+    使用流程:
+        String[] arr = {"hello", "world", "java"};
+        for (String s : arr) {
+            System.out.println(s);
+        }
+
+        List<String> list = new Arraylist<String>();
+        list.add("hello");
+        list.add("world");
+        list.add("java");
+
+        for(String s : list) {
+            System.out.println(s);
+        }
+
+    基本说明:
+        用于数组或集合的遍历
+        内部原理其实是一个iterator迭代器
+        实现了Iterator的类, 其实例化对象都可使用增强for循环
+        jdk5之后出现
+
+    代码格式:
+        for (内部元素类型 变量名 : 数组/集合的名字) {
+
+        }
+
+数据结构:
+    基本说明:
+        数据结构是计算机存储和组织数据的方式, 是相互间存在一种或多种特定关系的数据元素的集合
+        精心选择的数据结构可以带来更高的运行或存储效率
+    栈和队列:
+        栈:
+            特点:
+                先进后出
+                像个水杯
+            数据处理方式:
+                压栈/进栈:
+                    数据进入栈模型
+                弹栈/出栈:
+                    数据离开栈模型
+        队列:
+            特点:
+                先进先出
+                像个管子
+            数据处理方式:
+                入队列:
+                    数据进入队列模型
+                出队列:
+                    数据离开队列模型
+    数组和链表:
+        数组:
+            特点:
+                物理相邻
+                查询快, 增删除慢(增删需要移动后面的东西)
+        链表:
+            特点:
+                逻辑相邻
+                查询慢, 增删快(查询从头往后查, 增删直接该指针)
+
+ArrayList 和 LinkedList
+    基本说明:
+        都继承自List
+        都可以使用list的所有方法
+
+ArrayList:
+    使用流程:
+        ArrayList<String> list = new Arraylist<String>();
+
+        list.add("hello");
+        list.add("world");
+        list.add("java");
+
+    基本说明:
+        底层数据结构是数组
+        查询快, 增删慢
+
+LinkedList:
+    使用流程:
+        LinkedList<String> linkedList = new LinkedList<String>();
+
+        linkedList.add("hello");
+        linkedList.add("world");
+        linkedList.add("java");
+
+    基本说明:
+        底层数据结构是链表
+        增删快, 查询慢
+
+    LinkedList的特有方法:
+        public void addFirst(E e)
+            在表头插入元素
+        public void addLast(E e)
+            表尾插入元素
+        public E getFirst()
+            返回第一元素
+        public E getLast()
+            返回最后一个元素
+        public E removeFirst()
+            删除并返回第一个元素
+        public E removeLast()
+            删除并返回最后一个元素
+
+Set:
+    使用流程:
+        Set<String> set = new HashSet<String>();
+
+        set.add("hello");
+        set.add("world");
+        set.add("java");
+    基本说明:
+        直接继承Collection, 主要使用的是超类的方法
+        set是一个接口, 实现类有HashSet<E>(), 和
+        不包含重复元素
+        没有带索引的方法, 不能使用普通for循环遍历
+        不能保证顺序
+    遍历方法:
+        迭代器
+        增强for循环
+
+    哈希值:
+        使用流程:
+            package2.Student s1 = new package2.Student();
+
+            System.out.println(s1.hashCode);        //s1对象的哈希值
+            System.out.println("hello".hashCode);   //"hello"的哈希值
+            System.out.println("world".hashCode);   //"world"的哈希值
+
+
+        基本说明:
+            是Object的方法
+            是JDK根据对象的地址或字符串或数字算出来的int类型的数字
+        特点:
+            同一对象多次调用hashCode()方法返回的哈希值是相同的
+            默认情况下, 不同对象的哈希值是不同的, 而重写hashCode()方法, 可实现让不同对象的哈希值相同
+        获取哈希值的方法:
+            public int hashCode()
+                获取对象的哈希值
+HashSet:
+    使用流程:
+        //学生类中重写hashCode()和equals()方法 (自动生成)
+        HashSet<String> hs = new HashSet<String>();
+
+        hs.add("hello");
+        hs.add("world");
+        hs.add("java");
+
+    基本说明:
+        元素无顺序
+        底层数据类型是哈希表
+        不能保证集合顺序
+        无带索引的方法, 不能用普通for循环遍历
+        不包含重估元素
+    遍历:
+        增强for循环或迭代器
+
+    HashSet元素唯一性源码分析:(传入对象 E e)
+        调用e的hashCode()方法获取哈希值
+        根据哈希值计算存储位置
+        判断位置是否有元素           --(没有元素)--> e存储到该位置
+        遍历该位置所有元素, 比较哈希值是否相等    --(不相等)--> e存储到该位置
+        调用equals()方法, 比较内容            --(false)--> e存储到该位置
+        元素重复 --> 不存储
+            //看是不是空 -> 比较哈希值 -> 比较内容
+
+LinkedHashSet:
+    使用流程:
+        LinkedHashSet<String> lhs = new LinkedHashSet<String>();
+
+        lhs.add("hello");
+        lhs.add("world");
+        lhs.add("java");
+
+    基本说明:
+        元素有顺序
+        直接继承HashSet
+        链表保证顺序, 哈希表保证唯一
+        哈希表+链表实现的Set接口, 具有可预测的迭代持续
+
+TreeSet:
+    使用流程:
+        //自然排序(按大小排序)
+        TreeSet<Integer> trs = new TreeSet<Integer> ();     //注意这里的int是包装类
+
+        trs.add(10);        //自动装箱
+        trs.add(50);
+        trs.add(30);
+        trs.add(20);
+        tes.add(40)
+
+        //比较器排序
+        TreeSet<String> trs = new TreeSet<String> (new Comparator{});
+
+    基本说明:
+        元素有顺序, 可按照一定的规则进行排序
+        元素具有唯一性
+        直接继承自AbstractSet类, 而AbstractSet类继承自Set类(AbstractSet添加了自然排序功能)
+        排序方式取决于创建时使用的构造方法:
+            TreeSet():
+                根据元素的自然排序来排序,
+                元素类需要实现 Comparable<E e> 接口, 重写compareTo(E e)方法
+            TreeSet(Comparator comparator): 根据指定的比较器来排序  //是比较器的接口操作类
+        Comparator是一个接口, 定义了比较器排序的方法
+    遍历:
+        只能使用迭代器和增强for来遍历
+
+
+TreeSet元素的类实现Comparable<E e>排序:
+    使用流程:
+        (Student类)
+            public class package2.Student implements Comparable<package2.Student> {     //实现Comparable接口, 需要排序的元素是Student
+                @Override
+                public int compareTo(package2.Student) {             //重写compareTO(E e)方法
+                    int num = this.age - s.age;             //添加排序逻辑, s是上一个对象
+                    int num2 = num == 0 ? this.name.compareTo(s.name) : num;
+                    return num2;
+                }
+            }
+
+        (Demo)
+             TreeSet<package2.Student> ts = new TreeSet<package2.Student>();
+
+             package2.Student s1 = new package2.Student("zhangHui", 22);
+             package2.Student s2 = new package2.Student("capFeiYu", 22);
+             package2.Student s3 = new package2.Student("wuNam", 21);
+
+             ts.add(s1);
+             ts.add(s2);
+             ts.add(s3);
+
+             for (package2.Student s : ts) {
+                System.out.println(s);
+             }
+
+
+    基本说明:
+        TreeSet无参主要通过两种方式实现:
+            (1) 自定义类通过实现Comparable接口, 在自定义类中重写CompareTo方法, 按自定义规则自然排序
+            (2) 使用integer作为TreeSet集合的元素时, 遍历时默认自然排序(小到大)
+
+    Comparable<本类 类名>接口:
+        基本说明:
+            是一个排序接口, 有一个 CompareTO(package2.Student s){} 方法, 可通过重写这个方法来
+
+        comparable(E e):
+            基本说明:
+                自定义类需要重写这个方法, 并在内部添加排序逻辑
+                通过与集合元素的上一个对象相减:
+                    为正数 --> 从小到大排
+                    为负数 --> 从大到小排
+                    为0   --> 不进行排序
+
+            返回值意义:
+                0    不排序
+                正数  -->从小到达排
+                负数  -->从大到小排
+
+TreeSet比较器Comparator排序:
+    使用流程:
+        TreeSet<package2.Student> ts = new TreeSet<package2.Student>(new Comparator<package2.Student>() {      //执行了comparator操作类
+            @Override
+            public int compare(package2.Student o1, package2.Student o2) {
+                int num = o1.getAge() - o2.getAge();
+                int num2 = o1.getAge() - o2.getAge() == 0 ? o1.getName().compareTo(o2.getName()) : num;
+                return num2;
+            }
+        });
+
+        package2.Student s1 = new package2.Student("zhangHui", 22);
+        package2.Student s2 = new package2.Student("capFeiYu", 22);
+        package2.Student s3 = new package2.Student("wuNam", 21);
+
+        ts.add(s1);
+        ts.add(s2);
+        ts.add(s3);
+
+        for (package2.Student s : ts) {
+            System.out.println(s);
+        }
+    基本说明:
+        Comparator可简单认为是Compare的接口操作类
+        使用时在TreeSet中直接采用内部类方法使用Comparator, 重写compareTo()方法
+
+
+
+
+
+
+

@@ -1,0 +1,238 @@
+约束目录:
+    约束概念
+    非空约束:
+    唯一约束:
+    --> [主键约束]
+        主键约束:
+        主键约束-自动增长:
+    --> [外键约束]
+        外键约束:
+        外键约束-级联操作:
+知识点整理:
+    非空约束:
+        CREATE TABLE stu(                                                   --> [创建时给列添加非空约束]
+            NAME VARCHAR(20) NOT NULL,
+            age INT
+        );
+
+        alter table stu modify name varchar(20) not null;                   --> [创建后给列添加非空约束]
+
+        alter table stu modify name varchar(20);                            --> [删除列的非空约束]
+
+    唯一约束:
+        CREATE TABLE stu(                                                   --> [创建表时给列添加唯一约束]
+            NAME VARCHAR(20),
+            phone_number INT UNIQUE`db1`
+        );
+
+        ALTER TABLE stu MODIFY phone_number INT UNIQUE;                     --> [修改列添加唯一约束]
+
+        ALTER TABLE stu DROP INDEX phone_number;                            --> [删除列的唯一约束]
+
+    --> [主键约束]
+        主键约束:
+            CREATE TABLE IF NOT EXISTS stu(                                 --> [创建表时给列添加主键约束]
+                id INT PRIMARY KEY,
+                NAME VARCHAR(20)
+            );
+
+            ALTER TABLE stu MODIFY id INT PRIMARY KEY;                      --> [创建表后给列添加主键约束]
+
+            ALTER TABLE stu DROP PRIMARY KEY;                               --> [删除列的主键约束]
+
+        主键约束-自动增长:
+            CREATE TABLE IF NOT EXISTS stu(                                 --> [创建表时列添加主键, 并使其自动增长]
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                NAME VARCHAR(20)
+            );
+                (使用自动增长列)
+                    INSERT INTO stu VALUES(1, "张辉");                                    -- 设定基础数值, 主键列(id)设为1
+
+                    INSERT INTO stu(id, NAME) VALUES(NULL, "牛建平");                     -- 使用自动增长, 方式1
+                    INSERT INTO stu(NAME) VALUES("牛建平");                               -- 使用自动增长, 方式2
+
+
+            ALTER TABLE stu MODIFY id INT;                                  --> [创建表后添加自动增长 / 主键和自动增长]
+            ALTER TABLE stu MODIFY id INT PRIMARY KEY AUTO_INCREMENT;
+
+            ALTER TABLE stu MODIFY id INT;                                  --> [删除列的自动增长, 不删除主键]
+    --> [外键约束]
+        外键约束:
+            CREATE TABLE stu2(                                                                              --> [创建表给列添加外键]
+                NAME VARCHAR(20),
+                age INT,
+                class_id INT,
+                CONSTRAINT fk_stu2_to_class FOREIGN KEY (class_id) REFERENCES class(id)                         # 创建stu2表, 并将class_id列添加外键, 指向class表的id列, 取名:fk_stu2_to_class
+            );
+
+            ALTER TABLE stu2 ADD CONSTRAINT fk_stu2_to_class FOREIGN KEY (dep_id) REFERENCES class(id);     --> [创建表后添加主键]
+
+            ALTER TABLE stu2 DROP FOREIGN KEY fk_stu2_to_class;                                             --> [删除外键]
+
+        外键约束-级联操作:
+            CREATE TABLE stu2(                                                                              --> [创建表及外键列时添加级联]
+                NAME VARCHAR(20),
+                age INT,
+                class_id INT,
+                id CONSTRAINT fk_stu2_to_class FOREIGN KEY (dep_id) REFERENCES class(id) ON UPDATE CASCADE ON DELETE CASCADE
+
+            ALTER TABLE stu2 ADD CONSTRAINT fk_stu2_to_class FOREIGN KEY (dep_id) REFERENCES class(id) ON UPDATE CASCADE ON DELETE CASCADE;         --> [创建表及外键列后添加级联]
+
+
+约束概念:
+    说明:
+        用来指定列, 规范列
+    MySQL中约束的种类:
+        1 主键约束: primary key
+        2 非空约束: not null
+        3 唯一约束: unique
+        4 外键约束: foreign key
+
+非空约束:
+    使用流程:
+        --> [创建时给列添加非空约束]
+        CREATE TABLE stu(
+            NAME VARCHAR(20) NOT NULL,              # not null 指定name列非空; 创建表添加非空列
+            age INT
+        );
+
+        --> [创建后给列添加非空约束]
+        alter table stu modify name varchar(20) not null;   # 修改name为非空列
+
+        --> [删除列的非空约束]
+        alter table stu modify name varchar(20);            # 修改name不为非空列
+    基本说明:
+        某一列的值不能为null
+        指定非空列
+        删除非空约束可以用修改列属性的方法来删除非空约束
+
+    关键词:
+        not null
+
+
+唯一约束:
+    使用流程:
+        --> [创建表时给列添加唯一约束]
+            CREATE TABLE stu(
+                NAME VARCHAR(20),
+                phone_number INT UNIQUE`db1`
+            );
+
+        --> [修改列添加唯一约束]
+            ALTER TABLE stu MODIFY phone_number INT UNIQUE;
+
+        --> [删除列的唯一约束]
+            ALTER TABLE stu DROP INDEX phone_number;                       # 不能用修改的方法, 只能用删除索引的方法去删唯一约束
+
+    基本说明:
+        某一列的值不能重复
+        唯一约束可以有null值, 当时只能有一条条数据的列值为null
+        删除唯一约束只能用删除索引的方法来删除
+
+    关键词:
+        unique
+
+主键约束:
+    使用流程:
+        --> [创建表时给列添加主键约束]
+            CREATE TABLE IF NOT EXISTS stu(
+                id INT PRIMARY KEY,   -- id列添加主键约束
+                NAME VARCHAR(20)
+            );
+
+        --> [创建表后给列添加主键约束]
+            ALTER TABLE stu MODIFY id INT PRIMARY KEY;
+
+        --> [删除列的主键约束]
+            ALTER TABLE stu DROP PRIMARY KEY;
+    基本说明:
+        非空且唯一列
+        一张表只能有一个列含有主键
+        主键就是表中记录的唯一表述
+
+    关键词:
+        primary key
+
+主键约束-自动增长:
+    使用流程:
+        --> [创建表时列添加主键, 并使其自动增长]
+            (创建并设定id为 主键自动增长列)
+                CREATE TABLE IF NOT EXISTS stu(
+                    id INT PRIMARY KEY AUTO_INCREMENT,                  -- 主键约束, 自动增长
+                    NAME VARCHAR(20)
+                );
+            (使用自动增长列)
+                INSERT INTO stu VALUES(1, "张辉");                       -- 设定基础数值, 主键列(id)设为1
+
+                INSERT INTO stu(id, NAME) VALUES(NULL, "牛建平");        -- 使用自动增长, 方式1
+                INSERT INTO stu(NAME) VALUES("牛建平");                  -- 使用自动增长, 方式2
+
+        --> [创建表后列添加主键自动增长]
+            (列有主键的前提下 添加自动增长)
+                ALTER TABLE stu MODIFY id INT;
+            (同时给列添加主键和自动增长)
+                ALTER TABLE stu MODIFY id INT PRIMARY KEY AUTO_INCREMENT;
+
+        --> [删除列的自动增长, 不删除主键]
+            ALTER TABLE stu MODIFY id INT;
+
+    基本说明:
+        如果某一列是数值类型的, 使用auto_increment可以完成列值自动增长
+        只有主键约束的列才能用自动增长
+        根据上一个条数据的主键列值来自动增长
+
+    关键字:
+        primary key auto_increment
+
+外键约束:
+    使用流程:
+        --> [创建表给列添加外键]
+        CREATE TABLE stu2(
+        	NAME VARCHAR(20),
+        	age INT,
+        	class_id INT,
+        	CONSTRAINT fk_stu2_to_class FOREIGN KEY (class_id) REFERENCES class(id)            # 创建stu2表, 并将class_id列添加外键, 指向class表的id列, 取名:fk_stu2_to_class
+        );
+
+        --> [创建表后添加主键]
+        ALTER TABLE stu2 ADD CONSTRAINT fk_stu2_to_class FOREIGN KEY (dep_id) REFERENCES class(id);
+
+        --> [删除外键]
+        ALTER TABLE stu2 DROP FOREIGN KEY fk_stu2_to_class;
+    基本说明:
+        外键指的是本表的某列, 指向另一张表的主键列或唯一列:
+            本表外键列的内容必须是主表主键列的内容, 否则报错
+
+    关键字:
+        CONSTRAINT 外键名 FOREIGN KEY (外键列) REFERENCES 主表名(主表的主键列名)
+
+外键约束-级联操作:
+    使用流程:
+        --> [创建表及外键列时添加级联]
+        CREATE TABLE stu2(
+        	NAME VARCHAR(20),
+        	age INT,
+        	class_id INT,
+        	id CONSTRAINT fk_stu2_to_class FOREIGN KEY (dep_id) REFERENCES class(id) ON UPDATE CASCADE ON DELETE CASCADE
+
+        --> [创建表及外键列后添加级联]
+        ALTER TABLE stu2 ADD CONSTRAINT fk_stu2_to_class FOREIGN KEY (dep_id) REFERENCES class(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    基本说明:
+        级联更新:
+            更新副表的主键列数据时, 将同时更新主表的外键列数据
+        级联删除:
+            删除副表的主键列数据时, 将同时删除主表的外键列数据
+    关键字:
+        on update cascade   -->    级联更新
+        on delete cascade   -->    级联删除
+
+
+
+
+
+
+
+
+
+
+

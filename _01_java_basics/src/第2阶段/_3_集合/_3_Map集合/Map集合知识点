@@ -1,0 +1,165 @@
+map结合知识点目录:
+    Map -->
+        Map构造方法:
+        Map常用方法:
+        Map获取方法:
+        Map集合key遍历(方式一):
+        Map集合键值对遍历(方式二):
+        案例 统计字符串每个字符出现的顺序:
+        HashMap和TreeMap:
+Map构造方法:
+    使用流程:
+        Map<String, String> map = new HashMap<>();
+        map.put("001", "张辉");
+        map.put("002", "曹飞雨");
+        map.put("003", "吴楠");
+
+        System.out.println(map);
+
+    基本说明:
+        Map是一个接口, 通过多态创建对象
+        将键映射到值的对象, 键唯一不能重复
+    继承结构:
+        Map:
+            HashMap:
+    Map类声明:
+        Interface Map<K, V> {}
+    创建对象:
+        Map<Integer, String> map = new HashMap<>();
+            //Map是一个接口, 通过多态的方式创建对象
+
+Map常用方法:
+    使用流程:
+        System.out.println(m.remove("张无忌"));
+        System.out.println(m.containsKey("张无忌"));
+        System.out.println(m.containsValue("戈薇"));
+        System.out.println(m.isEmpty());
+        System.out.println(m.size());
+        m.clear();
+        System.out.println(m.size());
+    方法概况:
+        V put(K key, V value)
+            添加键值对
+        V remove(Object key)
+            根据键依次键值对元素
+        Void clear()
+            移除所有键值对元素
+        Boolean containsKey(Object key)
+            判断集合是否包含指定键
+        Boolean containsValue(object value)
+            判断集合是否包含指定值
+        boolean isEmpty()
+            判断集合是否为空
+        int size()
+            返回集合长度
+Map获取方法:
+    使用流程:
+        Map<String, String> m = new HashMap<>();
+
+        m.put("犬夜叉", "戈薇");
+        m.put("杨过", "小龙女");
+        m.put("张无忌", "小昭");
+
+        System.out.println(m.get("犬夜叉"));        //键获取值
+
+        Set<String> keySet = m.keySet();           //获取键集合
+        System.out.println(keySet);
+
+        Collection<String> value = m.values();     //获取值集合
+        System.out.println(value);
+    方法概况:
+        V get(Object Key)
+            根据键获取值
+        Set<K> keySet()
+            获取键的Set集合
+        Collection<V> values()
+            获取值的Collection集合
+        Set<Map.Entry<K, V>> entrySet()
+            获取所有键值对对象的集合
+
+Map集合key遍历(方式一):
+    使用流程:
+        Map<String, String> map = new HashMap<>();  //创建map集合
+
+        map.put("犬夜叉", "戈薇");
+        map.put("杨过", "小龙女");
+        map.put("张无忌", "小昭");
+
+        Set<String> keySet = map.keySet();          //获取Key的Set集合 使用Map的KeySet()方法
+        for (String key : keySet) {                 //遍历ket获取value, 由键找值
+            String value = map.get("犬夜叉")
+            System.out.println(key + "<->" value);
+        }
+
+    基本说明:
+        先用KeySet()方法, 再用get(E key)方法
+
+Map集合键值对遍历(方式二):
+    使用流程:
+        Map<String, String> map = new HashMap<>();
+
+        map.put("犬夜叉", "戈薇");
+        map.put("杨过", "小龙女");
+        map.put("张无忌", "小昭");
+
+        Set<Map.Entry<String, String>> entrySet = Map.entrySet();
+        for (Map.Entry<String, String> me : entrySet) {
+            key = me.getKet();
+            value = me.getValue();
+            System.out.println(key + ":" + value);
+        }
+
+    基本说明:
+        entrySet()返回一个元素为键值对象的Set集合, 通过这个对象的getKey()和getValue()获取兼职
+
+统计字符串每个字符出现的顺序:
+    使用流程:
+        String s = "helloWorldJava";
+
+        HashMap<Character, Integer> hm = new HashMap<>();
+
+        //给集合添加元素, 首次出现的字符hm.put(key, 1), 不是首次出现的字符hm.put(key, value++)
+        for (int i = 0; i < s.length(); i++) {
+            char key = s.charAt(i);
+            Integer value = hm.get(key);
+            if (value == null) {
+                hm.put(key, 1);             //首次出现, value(次数)为1
+            } else {
+                value ++;                   //不是首次出现, value++
+                hm.put(key,value);
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        //遍历集合, 获取key和value, 按要求添加为可变字符串
+        Set<Character> keySet = hm.keySet();
+        for(Character key : keySet) {
+            Integer value = hm.get(key);
+            sb.append(key).append('(').append(value).append(')');
+        }
+        //可变字符串转换为字符串
+        String str = sb.toString();
+
+    基本说明:
+        重点 --> 生成存储 字符 : 字符出现次数 Map集合(TreeMap或HashMap)
+
+    集合存储字符及字符的出现次数:
+        for (int i = 0; i < s.length(); i++) {
+            char key = s.charAt(i);
+            Integer value = hm.get(key);
+            if (value == null) {
+                hm.put(key, 1);             //首次出现, value(次数)为1
+            } else {
+                value ++;                   //不是首次出现, value++
+                hm.put(key,value);
+            }
+        }
+
+HashMap和TreeMap:
+    使用流程:
+        TreeMap<String, Integer> tm = new TreeMap<>();
+        tm.put("hello", 1);
+    基本说明:
+        使用方法一模一样
+        TreeMap默认按造键的顺序自然排序
+

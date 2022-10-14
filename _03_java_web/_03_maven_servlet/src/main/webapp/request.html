@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>request-test-page</title>
+</head>
+<body>
+    <!--  1 /requestLine 请求行-->
+    <span>1. /requestLine请求</span>
+    <form action="requestLine" method="GET">
+        <input type="text" placeholder="输入用户名" name="username-get">
+        <input type="submit" value="提交(get)">
+    </form>
+
+    <form action="requestLine" method="post">
+        <input type="text" placeholder="输入用户名" name="username-post">
+        <input type="submit" value="提交(post)">
+    </form>
+
+
+    <br><br>
+    <!-- 2 /requestHeader 请求头 -->
+    <span>2. /requestHeader请求</span>
+    <form action="/requestBody" method="get">
+        <input type="text" placeholder="输入用户名" name="username-get">
+        <input type="submit" value="提交(get)">
+    </form>
+
+    <form action="requestHeader" method="post">
+        <input type="text" placeholder="输入用户名" name="username-post">
+        <input type="submit" value="提交(post)">
+    </form>
+
+    <!-- 3 /requestBody 请求体 -->
+    <br><br>
+    <span>3. /requestBody</span>
+    <form action="/requestBody" method="get">
+        <input type="text" placeholder="输入用户名" name="username-get">
+        <input type="submit" value="提交(get)">
+    </form>
+
+    <form action="requestBody" method="post">
+        <input type="text" placeholder="输入用户名" name="username-post">
+        <input type="text" placeholder="输入密码" name="password-post">
+        <input type="submit" value="提交(post)">
+    </form>
+
+    <!-- 4 /requestMethod-->
+    <br><br>
+    <span>4. /requestMethod</span>
+    <form action="/requestMethod" method="get">
+        <input type="text" placeholder="输入用户名" name="username-get">
+        <input type="submit" value="提交(get)">
+    </form>
+
+    <form action="requestMethod" method="post">
+        <input type="text" placeholder="输入用户名" name="username-post">
+        <input type="text" placeholder="输入密码" name="password-post">
+
+        <br>
+        <input type="checkbox" name="hobby" value="game" checked="checked">
+        <input type="checkbox" name="hobby" value="study" checked="checked">
+        <span>勾选两个发送参数数组</span>
+        <input type="submit" value="提交(post)">
+    </form>
+    <!-- 5 /requestForward1 -->
+    <br><br>
+    <span>5. /requestForward1</span>
+    <form action="requestForward1" method="post">
+        <input type="text" placeholder="输入用户名" name="username-post">
+        <input type="submit" value="提交(post)">
+    </form>
+
+    <!-- 6 /requestForward2 -->
+    <br><br>
+    <span>6. /requestForward2</span>
+    <form action="requestForward2" method="post">
+        <input type="text" placeholder="输入用户名" name="username-post">
+        <input type="submit" value="提交(post)">
+    </form>
+
+    <!-- 7 /servletContext -->
+    <br><br>
+    <span>7. /servletContext</span>
+    <form action="/servletContext" method="post">
+        <input type="text" placeholder="输入用户名" name="username-post">
+        <input type="submit" value="提交(post)">
+    </form>
+
+</body>
+</html>

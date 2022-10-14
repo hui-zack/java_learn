@@ -1,0 +1,124 @@
+多表查询目录:
+    迪卡尔集:
+    清理笛卡尔集的方法/多表查询的分类:
+    --> [内连接查询]
+        内连接查询-隐式内连接:
+        内连接查询-显式内连接:
+    --> [外连接查询]
+        左外连接和右外连接查询:
+    --> [子查询]
+        单行单列子查询:
+        多行单列子查询:
+        多行多列子查询:
+
+多表查询总结:
+    --> [内连接查询]
+        内连接查询-隐式内连接:
+            SELECT * FROM emp, dept WHERE emp.dept_id = dept.id;
+            SELECT emp.name AS emp_name, gender, dept.name AS dept_name FROM emp, dept WHERE emp.dept_id = dept.id;
+        内连接查询-显式内连接:
+            SELECT * FROM emp INNER JOIN dept ON emp.`dept_id` = dept.`id`;
+            SELECT * FROM emp JOIN dept ON emp.`dept_id` = dept.id;
+
+    --> [左外连接和右外连接查询]
+        左外连接
+            SELECT emp.*, dept.name FROM emp LEFT JOIN dept ON emp.dept_id = dept.id;
+        右外连接
+            SELECT emp.*, dept.name FROM emp RIGHT JOIN dept ON emp.dept_id = dept.id;
+
+    --> [子查询]
+    单行单列子查询:
+        SELECT * FROM emp WHERE emp.salary = (SELECT MAX(emp.salary) FROM emp);                                         --> [查询工资最高员工的所有信息]
+
+    多行单列子查询:
+        SELECT * FROM emp WHERE emp.dept_id IN (SELECT id FROM dept WHERE NAME = "市场部" OR NAME = "财务部");            --> [查询市场部和财务部员工的所有信息]
+
+    多行多列子查询:
+        SELECT * FROM dept, (SELECT * FROM emp WHERE emp.`join_data` > "2011-11-11") AS t2 WHERE dept.id = t2.dept_id;  --> [查询入职日期2011-11-11日之后的员工信息和部门信息(子查询的结果集多行多列)]
+
+------------------------------------------------------------------------------------------------------------------------
+迪卡尔集:
+    select * from emp, dept;
+        同时查两张表会生成一个笛卡尔集:
+            笛卡尔集:
+                笛卡尔集 == 两张表的条数据的所有组成情况
+                条数据数量 == 两张表的条数据数量的积
+                笛卡尔集中的条包含 正确条数据 和 错误条数据
+        多表查询的实质就是清理笛卡尔集中错误的条数据
+
+清理笛卡尔集的方法/多表查询的分类:
+    内连接查询:
+        隐式内连接:
+            使用where条件查询符合条件的条数据:
+                SELECT * FROM emp, dept WHERE emp.dept_id = dept.id;
+                SELECT emp.name AS emp_name, gender, dept.name AS dept_name FROM emp, dept WHERE emp.dept_id = dept.id;
+                    //对于两张表同时具有的列名, 需要加 表名. 加以区分
+        显示内连接:
+            使用
+    外连接查询:
+    子查询:
+
+--> [内连接查询]
+内连接查询-隐式内连接:
+    使用流程:
+        --> [不标准格式查询]
+            SELECT * FROM emp, dept WHERE emp.dept_id = dept.id;
+            SELECT emp.name AS emp_name, gender, dept.name AS dept_name FROM emp, dept WHERE emp.dept_id = dept.id;
+                -- 对于两张表同时具有的列名, 需要在前面加上表名. 加以区分
+
+        --> [标准格式查询]
+            SELECT
+                t1.name,			  	-- 员工名
+                t1.gender, 				-- 员工性别
+                t2.name					-- 员工部门
+            FROM
+                emp AS t1, 				-- 员工表
+                dept AS t2				-- 部门表
+            WHERE
+                t1.`dept_id` = t2.`id`
+    基本说明:
+        使用where清除笛卡尔集中无用的条数据, (dept_id和dept.id列值不相等)的部分
+        只保留两表的笛卡尔集中符合条件的数据
+
+内连接查询-显式内连接:
+    使用流程:
+        SELECT * FROM emp INNER JOIN dept ON emp.`dept_id` = dept.`id`;
+        SELECT * FROM emp JOIN dept ON emp.`dept_id` = dept.id;
+    基本说明:
+        显示内连接 关键值 [inner] join
+
+--> [外连接查询]
+
+左外连接和右外连接查询:
+    使用流程:
+    --> [左外连接]
+        SELECT emp.*, dept.name FROM emp LEFT JOIN dept ON emp.dept_id = dept.id;
+    --> [右外连接]
+        SELECT emp.*, dept.name FROM emp RIGHT JOIN dept ON emp.dept_id = dept.id;
+    基本说明:
+        左外连接保留左表中的所有条数据, 以及两表的交集列数据
+        右外连接保留右表中的所有条数据, 以及两表的交集列数据
+
+--> [子查询]
+单行单列子查询:
+    使用流程:
+        --> [查询工资最高员工的所有信息]
+            SELECT * FROM emp WHERE emp.salary = (SELECT MAX(emp.salary) FROM emp);
+    基本说明:
+        子查询语句的结果集是单行单列, 可认为是一个值:
+            使用运算符判断( >  >=  <  <=  = )
+
+多行单列子查询:
+    使用流程:
+        --> [查询市场部和财务部员工的所有信息]
+            SELECT * FROM emp WHERE emp.dept_id IN (SELECT id FROM dept WHERE NAME = "市场部" OR NAME = "财务部");
+    基本说明:
+        子查询语句的结果集如果是多行单列, 可认为是列表:
+            使用in来判断: 如 in (3, 2)
+
+多行多列子查询:
+    使用流程:
+        --> [查询入职日期2011-11-11日之后的员工信息和部门信息(子查询的结果集多行多列)]
+            SELECT * FROM dept, (SELECT * FROM emp WHERE emp.`join_data` > "2011-11-11") AS t2 WHERE dept.id = t2.dept_id;
+    基本说明:
+        子查询语句的结果集如果是多行多列, 可认为是一张新表

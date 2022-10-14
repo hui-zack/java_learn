@@ -1,0 +1,51 @@
+Junit:
+    使用流程:
+        (CalculatorTest类 Calculator的测试类)
+        Calculator cal;
+
+        @Before
+        public void init() {
+            this.cal = new Calculator();
+            System.out.println("start...");
+        }
+
+        @After
+        public void close(){
+            System.out.println("close..." + "\n");
+        }
+
+        @Test
+        public void testAdd() {
+            int result = cal.add(1, 2);
+            Assert.assertEquals(3, result);           //Assert.assertEquals(long Expected, long actual)方法, 断言结果
+        }
+
+        @Test
+        public void testSub() {
+            int result = cal.sub(10, 6);
+            Assert.assertEquals(4, result);           //Assert.assertEquals(long Expected, long actual)方法, 断言结果
+        }
+
+    基本说明:
+        Junit三注释:
+            @Before
+            @After
+            @Test
+        断言:
+            Assert.assertEquals(4, result);
+
+    Junit的注释:
+        @Before :
+            Junit的注释, 每个Test运行前都执行该部分代码
+        @After
+            Junit的注释, 每个Test运行后都执行该部分代码
+        @Test:
+            被@test修饰的方法, 可直接运行
+            
+    Assert类:
+        public static void assertEquals(long Expected, long actual):
+            Assert类的静态方法, 用于断言结果是否和预期一致
+
+
+
+

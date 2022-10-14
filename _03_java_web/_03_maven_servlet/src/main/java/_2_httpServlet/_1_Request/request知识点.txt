@@ -1,0 +1,501 @@
+request知识点:
+    http:
+    请求消息:
+    浏览器+Servlet请求流程:
+    request-请求行:
+    request-请求头:
+    request-请求体:
+    request常用方法:
+    post请求中文乱码问题解决:
+    请求转发:
+    数据转发:
+    获取servletContext:
+
+
+http:
+	* http: Hyper Text Transfer Protocol
+			超文本传输协议: 定义了客户端和服务器通信时, 发送数据的格式
+	* http特点:
+		1. 基于TCP/IP的高级协议
+		2. 默认端口号: 80
+		3. 基于请求/响应模型: 一次请求对应一次响应
+		4. 无状态, 每次请求之间相互独立
+	* 历史版本:
+		1.0版本
+			每一次请求都会断开, 下一次请求将建立新的连接, 比较耗时
+		1.1版本
+			响应后的一定时间内不会断开
+			对缓存的支持比较好
+请求消息:
+	内容:
+		* 请求消息数据格式(4部分):
+			实例:
+				POST /httpProject/login.html	HTTP/1.1            //* 请求行
+                Host: localhost                         //* 请求头
+                _2_case_userLogin.teacherCode.User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0
+                Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+                Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+                Accept-Encoding: gzip, deflate
+                Referer: http://localhost/login.html
+                Connection: keep-alive
+                Upgrade-Insecure-Requests: 1
+														//* 请求空行
+                username=zhangsan                       //* 请求体
+
+			1. 请求行:
+				GET /login.html HTTP/1.1    -->     请求方式 + 请求url + 请求协议/版本
+			2. 请求头:
+				Host: localhost             -->     请求头名称 : 请求头值
+			3. 请求空行:
+				                            -->     只有换行符的一行
+			4. 请求体:
+				username=zhangsan			-->     表单名=表单值
+		1. 请求行
+			内容:
+				POST /login.html	HTTP/1.1            //* 请求行
+			请求方式:                               //http有七种请求方式
+				get:
+					特点:
+						请求参数在请求行中
+						请求的url长度有限制
+						不太安全
+				post:
+					特点:
+						请求参数在请求体中
+						请求的url长度没有限制
+						相对安全
+		2. 请求头      //常见的请求头
+			请求头作用: 告诉服务器一些信息
+			请求头内容:
+				Host: localhost
+	            _2_case_userLogin.teacherCode.User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0
+					浏览器告诉服务器, 访问资源时使用的浏览器版本信息
+					可以在服务器端获取该头的信息, 解决资源在浏览器兼容的问题
+	            Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+					描述浏览器可解析的资源种类
+		        Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+	                描述浏览器可解析的语言种类
+		        Accept-Encoding: gzip, deflate
+		            描述浏览器可解析的压缩文件种类
+		        Referer: http://localhost/login.html
+		            描述浏览器从哪里获得当前链接
+	                用处:
+	                    1. 防止别人盗取链接
+	                    2. 进行统计工作
+		        Connection: keep-alive
+		            描述本次请求后是否立即关闭连接
+		        Upgrade-Insecure-Requests: 1
+		3. 请求行:
+			只有换行符的空行, 用来分割请求头和请求体
+		4. 请求体(正文):
+			作用:
+				用来封装POST请求消息的请求参数
+
+
+浏览器+Servlet请求流程:
+	* 浏览器一次http请求servlet的流程:
+		1. tomcat服务器根据请求url中的资源路径, 创建对应的ServletDemo1对象
+		2. tomcat服务器, 创建request和response对象, request对象中封装消息数据
+		3. tomcat将request和response两个对象传递给service方法, 并且调用service方法
+		4. 程序员可以通过request对象获取请求消息数据, 通过response对象设置响应消息数据
+		5. 服务器在给浏览器做出响应之前, 会从response对象中拿程序员设置的响应消息数据, 返回给浏览器
+	* request和response原理
+		1. request和response对象是由服务器(tomcat)创建, 程序员使用
+		2. request对象获取请求消息, response获取响应详细
+	* 如果tomcat项目设置了虚拟路径, 那么在html表单的action属性必须加上虚拟路径, 否则将无法访问到对应的servlet
+
+request-请求行:
+	使用流程:
+		--> [servlet请求行操作]
+			@WebServlet("/requestLine")
+            public class _1_RequestDemo1 extends HttpServlet {
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    System.out.println("-----");
+                    System.out.println(req.toString());
+
+                    String method = req.getMethod();                    //* 1.获取请求方式 String getMethod()
+                    System.out.println("获取-请求方式: " + method);
+
+                    String contextPath = req.getContextPath();          //* 2.获取虚拟目录 String getContextPath()
+                    System.out.println("获取-虚拟路径:" + contextPath);
+
+                    String servletPath = req.getServletPath();          //* 3.获取Servlet路径 String getServletPath()
+                    System.out.println("获取-servlet路径: " + servletPath);
+
+                    String queryString = req.getQueryString();          //* 4.获取get请求参数 String getQueryString()
+                    System.out.println("获取-获取get请求参数: " + queryString);
+
+                    String requestURI = req.getRequestURI();            //* 5.获取URI String getRequestURI()
+                    System.out.println("获取-uri: " + requestURI);
+
+                    StringBuffer requestURL = req.getRequestURL();      //* 6.获取url: StringBuffer getRequestUrl()
+                    System.out.println("获取-url: " + requestURL);
+
+                    String protocol = req.getProtocol();                //* 7.获取协议及版本 String getProtocol()
+                    System.out.println("获取-协议及版本: " + protocol);
+
+                    String remoteAddr = req.getRemoteAddr();            //* 8.获取客户机的IP地址 String getRemoteIP()
+                    System.out.println("获取-IP: " + remoteAddr);
+                }
+            }
+
+	情况说明:
+		* 继承结构:
+			ServletRequest                                              -- 接口
+					| 继承
+				HttpServletRequest                                      -- 接口
+						| 实现
+					org.apache.catalina.connector.RequestFacade         -- tomcat类
+		* request功能:
+			1. 请求消息数据
+			2. 其他功能
+		* url和uri
+			url: 统一资源定位符 http://localhost/requestLine
+			uri: 统一资源标识符 /requestLine
+		* Enumeration<String>类/对象
+			1. 说明:
+				1. 由request对象.getHeaderNames()返回
+				2. 该对象具有迭代器, 且只能由迭代器遍历(该对象未实现.size()方法)
+				3. 存储了http请求头的各键名
+			2. 方法:
+				.hasMoreElements()方法:
+					判断是否具有下一个元素:
+						有   -->  返回真
+						无   -->  返回假
+				String nextElement()方法:
+					返回下一个元素名称
+
+			3. Enumeration<String>对象的迭代器实例:
+		        Enumeration<String> headerNames = req.getHeaderNames();
+                while (headerNames.hasMoreElements()){
+                    String headerName = headerNames.nextElement();
+                    System.out.println(headerName);
+                }
+	内容:
+		1 获取请求行数据:
+			请求行内容: POST /httpProject/login.html?name=ZH	HTTP/1.1
+			方法:
+				1) 获取请求方式
+					String getMethod()
+						返回 "POST"
+				2) 获取虚拟目录                                   //* 重点
+					String getContextPath()
+						返回 "/httpProject"
+				3) 获取Servlet路径
+					String getServletPath()
+						返回 "/login.html"
+				4) 获取get请求参数:
+					String getQueryString()
+						返回 "username-get=123&id=12"
+				5) 获取URI:                                       //* 重点
+					String getRequestURI()
+						返回 "/httpProject/login.html"
+				6) 获取url:
+					StringBuffer getRequestUrl()
+						返回 "http://localhost/http/login.html"
+				7) 获取协议及版本:
+					String getProtocol()
+						返回 HTTP/1.1
+				8) 获取客户机的IP地址:
+					String getRemoteAddr()
+						返回 客户机IP
+
+
+request-请求头:
+	使用流程:
+		--> [servlet 请求头操作]
+            @WebServlet("/requestHeader")
+                public class requestHeaderDemo extends HttpServlet {
+                    @Override
+                    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                        System.out.println("------\n--> [part1 Enumeration<String>迭代器]");
+                        // --> [part1 Enumeration<String>迭代器]
+                        Enumeration<String> headerNames = req.getHeaderNames();             //* Enumeration<String> getHeaderNames()方法
+                        while (headerNames.hasMoreElements()){
+                            String headerName = headerNames.nextElement();
+                            String header = req.getHeader(headerName);                      //* String getHeader(String name)方法
+                            System.out.println("%s : %s".formatted(headerName, header));
+                        }
+
+                        // --> [part2 判断浏览器]
+                        System.out.println("\n--> [part2 判断浏览器]");
+                        String agent = req.getHeader("user-agent");                      //* String getHeader(String name)方法
+                        if (agent.contains("Chrome")){
+                            System.out.println("请求来自 -> Chrome浏览器");
+                        } else if (agent.contains("Firefox")){
+                            System.out.println("请求来自 -> 火狐浏览器");
+                        } else if (agent.contains("Trident")){
+                            System.out.println("请求来自 -> IE浏览器");
+                        }
+                        System.out.println("user-agent : " + agent);
+
+                        // --> [part3 防盗链]
+                        System.out.println("\n--> [part3 防盗链]");
+                        String referer = req.getHeader("referer");
+                        if (referer == null){
+                            System.out.println("链接来自复制或手输");
+                        } else if (referer.contains("login.html")){
+                            System.out.println("链接来自我方登录页面");
+                        } else {
+                            System.out.println(referer);
+                        }
+                    }
+                }
+
+	内容:
+		* 获取请求头数据:
+            1) 通过请求同名称获取值
+                String getHeader(String name)
+                    说明: 返回对应请求头的值
+                    实例:
+                         String header = req.getHeader("user-agent");
+            2) 获取所有的请求头名称
+                Enumeration<String> getHeaderNames()
+                    说明:
+                        1.返回所有的请求头名称, 并存储在Enumeration<String>, 该对象只能由该类中的迭代器遍历
+                        2.详见 情况说明/3
+                    实例:
+                        Enumeration<String> headerNames = req.getHeaderNames();         //* Enumeration<String> getHeaderNames()方法
+                        while (headerNames.hasMoreElements()){
+                            String headerName = headerNames.nextElement();
+                            String header = req.getHeader(headerName);                  //* String getHeader(String name)方法
+                            System.out.println("%s : %s".formatted(headerName, header));
+                        }
+
+request-请求体:
+	使用流程:
+		--> [/servlet 请求体操作]
+            @WebServlet(urlPatterns = "/requestBody")
+            public class requestBodyDemo extends HttpServlet {
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    System.out.println("get has run");
+                }
+
+                @Override
+                protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    Enumeration<String> headerNames = req.getHeaderNames();
+                    while (headerNames.hasMoreElements()) {
+                        String header = headerNames.nextElement();
+                        System.out.println("%s : %s".formatted(header, req.getHeader(header)));
+                    }
+                    BufferedReader reader = req.getReader();
+
+                    String line;
+                    while ((line = reader.readLine()) != null){
+                        System.out.println(line);
+                    }
+                }
+            }
+    内容:
+        * 获取请求体数据:
+            1) 说明:
+                只有post请求才有请求体, 在请求体中封装了post请求的请求参数
+            2) 请求体获取步骤:
+                1) 获取流对象:
+                    获取字符输入流(只能操作字符数据):
+                        BufferedReader getReader()
+                    获取字节输入流(能操作所有类型的数据):
+                        servletInputStream getInputStream()
+                            在文件上传知识点讲解
+                2) 从流对象中获取请求体数据
+
+
+request常用方法:
+    使用流程:
+        --> [request 常用的四个方法]
+            @WebServlet("/requestMethod")
+            public class requestMethodDemo extends HttpServlet {
+                @Override
+                protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    System.out.println("--------------------\n--> 1[获取所有的参数名称]");
+
+                    Enumeration<String> parameterNames = req.getParameterNames();
+                    while (parameterNames.hasMoreElements()){
+                        String parameterName = parameterNames.nextElement();
+                        String parameter = req.getParameter(parameterName);
+                        System.out.println("    %s = %s".formatted(parameterName, parameter));
+                    }
+
+
+                    System.out.println("--> 2[获取请求参数值]");
+                    String parameter1 = req.getParameter("username-post");
+                    System.out.println("    获取参数请求值(username-post): " + parameter1);
+
+
+
+                    System.out.println("--> 3[获取参数值数组]");
+                    String[] hobbies = req.getParameterValues("hobby");
+                    for (int i = 0; i < hobbies.length; i++) {
+                        String hobby = hobbies[i];
+                        System.out.println("    根据名称获取参数值的数组(hobby): " + hobby);
+                    }
+
+                    System.out.println("--> 4[获取请求名称及参数的map集合]");
+                    Map<String, String[]> parameterMap = req.getParameterMap();
+                    Set<String> keySet = parameterMap.keySet();
+                    for(String key : keySet){
+                        String[] values = parameterMap.get(key);
+                        for (int i = 0; i < values.length; i++){
+                            String value = values[i];
+                            if (i == 0) {
+                                System.out.print("    %s=%s".formatted(key, value));
+                            } else {
+                                System.out.print("&%s=%s".formatted(key, value));
+                            }
+                        }
+                        System.out.println();
+                    }
+                }
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+                }
+            }
+
+    内容:
+        request其他方法(常用)
+            1. 根据参数名称获取参数值:
+                1) String getParameter(String name):
+                    说明:
+                        返回对应的参数值, 如: username=zh
+                        不论是get还是post请求都能使用该方法
+
+                2) String[] getParameterValues(String name):
+                    根据请求参数名称获取参数值的数组
+                    如: bobby=test&hobby=game
+                3) Enumeration<String> getParameterNames();
+                    获取所有请求的参数名称
+                    注意: 只能使用特有的迭代器遍历
+                4) Map<String, String[]> getParameterMap():
+                    获取所有参数的map集合
+                5) String contextPath()
+                    动态获取虚拟目录
+
+request请求中文乱码问题解决:
+	情况说明:
+	    乱码原因:
+	        get方式:
+	            get请求中含有中文, 浏览器对请求进行url(utf-8)编码, 但tomcat使用iso-8859-1解码
+
+	        post方式:
+	            post请求中通过getReader获取流, 然后获得请求参数, 会有乱码
+
+	    解决方式:
+	        get:
+	            获取字符串后使用URLDecoder工具类解码
+	            实例:
+	                queryString = URLDecoder.decode(queryString, "utf8");       //* url解码
+	        post:
+		        在获取post请求参数前, 使用代码设置流的编码
+		        实例:
+		            doPost(){
+		                request.setCharacterEncoding("utf8");       //* 第一行
+		            }
+	    说明:
+	        仅对req.getParameterNames()方法有效
+            对req.getReader()或req.getInputStream()方法没有效果
+
+
+请求转发:
+    使用流程:
+        --> [part1 /requestForward1]
+            @WebServlet("/requestForward1")
+            public class servlet1 extends HttpServlet {
+                @Override
+                protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    System.out.println("----------");
+                    System.out.println("requestForward1-访问, 转发至: \"requestForward2\"");
+                    RequestDispatcher requestDispatcher = req.getRequestDispatcher("/requestForward2");
+
+                    requestDispatcher.forward(req, resp);
+
+                }
+            }
+        --> [part2 /requestForward1_1]
+            @WebServlet("/requestForward2")
+            public class servlet2 extends HttpServlet {
+                @Override
+                protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    req.setCharacterEncoding("utf8");
+                    Enumeration<String> parameterNames = req.getParameterNames();
+                    while (parameterNames.hasMoreElements()){
+                        String parameterName = parameterNames.nextElement();
+                        String parameter = req.getParameter(parameterName);
+                        System.out.println("(requestForward2-访问, 输出: %s=%s".formatted(parameterName, parameter));
+                    }
+                }
+            }
+    情况说明:
+        * 请求转发:
+            服务器内部进行资源跳转的方式
+            通常由一个servlet跳转到另一个servlet, 多个servlet共同实现复杂功能
+        * 请求转发流程:
+            1. 通过当前request获取转发器对象
+            2. 通过转发器对象特有方法实现转发
+        * 请求转发特点(面试重点):
+            1. 浏览器地址栏不发生变化
+            2. 只能转发到当前服务器内部资源
+            3. 浏览器只给服务器发送了一个请求, 和服务器内部转发次数无关
+    内容:
+        * 请求转发流程:
+            1. 通过request对象获取转发器对象:
+                RequestDispatcher getRequestDispatcher(String path)
+            2. 通过转发器对象的Forward方法进行转发
+                forward(ServletRequest request, ServletResponse response)
+
+数据转发:
+    使用流程:
+        --> [part1 requestForward2 数据转发]
+	        @WebServlet("/requestForward2")
+            public class servlet1 extends HttpServlet {
+                @Override
+                protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    System.out.println("----");
+                    System.out.println("requestForward2访问  请求转发至requestForward2_1 ...");
+
+                    req.setAttribute("data1", "userName=张辉");                       //* setAttribute(String name, Object data)方法; 数据转发
+                    /* 请求转发必须放在后面, 否则下一个servlet运行时可能无法及时接受到数据!!!! */
+                    req.getRequestDispatcher("/requestForward2_1").forward(req, resp);   // 请求转发
+                }
+            }
+        --> [part2 requestForward2 数据转发]
+            @WebServlet("/requestForward2_1")
+            public class servlet2 extends HttpServlet {
+                @Override
+                protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    System.out.println("requestForward2_1 已接受请求 ...");
+                    Object data1 = req.getAttribute("data1");                   //* getAttribute(String dataName)方法; 接收域内数据
+
+                    System.out.println("requestForward2_1 已接受数据 ... %s".formatted(data1));
+
+                }
+            }
+
+	情况说明:
+		* 转发是一次请求
+		* 域对象
+			一个有作用范围的对象, 可以在范围内共享数据
+		* request域对象
+			代表一次请求的范围, 一般用于请求转发的多个资源(servlet)中共享数据
+			request域对象对应的方法, 在request域名所有servlet都可以访问
+		* 请求转发和数据转发:
+			请求转发必须放在后面, 否则下一个servlet运行时可能无法即使接受到数据!!!!
+	内容:
+		* request对象的域内数据传输方法
+			1. 域内存储数据
+				setAttribute(String name, Object ogj):
+					参数:
+						String name  --> 自定义数据名
+
+			2. 通过键获取域内存储好的数据
+				Object getAttribute(String name)
+
+			3. 通过键移除域内数据
+				removeAttribute(String name)
+获取servletContext:
+    情况说明:
+        * request对象获取context方法
+
+

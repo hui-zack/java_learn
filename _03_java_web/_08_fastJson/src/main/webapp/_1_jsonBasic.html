@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>json基础语法</title>
+</head>
+<body>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+    var json = {
+        "name": "zhangsan",
+        "age": 23,
+        "addr": ["成都", "太原", "大同"]
+    };
+
+    var json1 = {
+        "username": "zhangsan",
+        "password": "123456"
+    }
+
+    axios ({
+        method: "post",
+        url: "http://localhost/jsonChangeServlet",
+        data: json1
+    }).then(function (response) {
+        var end = "<br>"
+        document.write(response.data + end)
+    })
+
+
+
+
+</script>
+</body>
+</html>
